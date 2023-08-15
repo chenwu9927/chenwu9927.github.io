@@ -24,12 +24,63 @@
 <p>然后在浏览器中打开<code>localhost:4000</code> 便可以预览这个初始博客。</p>
 <p>使用 <code>Ctrl+C</code> 可以结束预览。</p>
 <h2 id="修改博客信息"><a href="#修改博客信息" class="headerlink" title="修改博客信息"></a>修改博客信息</h2><p>进入项目文件夹，使用vscode（或其他工具）打开 <code>_config.yml</code> ，依据文件注释做改动。</p>
-<h2 id="安装主题-以maupassant为例"><a href="#安装主题-以maupassant为例" class="headerlink" title="安装主题(以maupassant为例)"></a>安装主题(以maupassant为例)</h2><blockquote>
+<h2 id="安装主题-以maupassant为例"><a href="#安装主题-以maupassant为例" class="headerlink" title="安装主题 (以maupassant为例)"></a>安装主题 (以<code>maupassant</code>为例)</h2><blockquote>
 <p>项目地址:</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/tufu9441/maupassant-hexo">https://github.com/tufu9441/maupassant-hexo</a></p>
+<p>更多主题：</p>
+<p><a target="_blank" rel="noopener" href="https://hexo.io/themes/">https://hexo.io/themes/</a></p>
 </blockquote>
-<p>在博客根目录下打开git bash，</p>
-<p>未完待续</p>
+<p>在博客根目录下打开git bash，执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https://github.com/tufu9441/maupassant-hexo.git themes/maupassant</span><br><span class="line">$ npm install hexo-renderer-pug --save</span><br><span class="line">$ npm install hexo-renderer-sass-next --save</span><br></pre></td></tr></table></figure>
+
+<p>若克隆失败，请尝试使用代理或者切换至NPM的国内镜像源。也可以手动下载压缩包，将解压后得到的文件夹复制到根目录下的 <code>themes</code> 文件夹，并将该文件夹名称后的<code>-hexo-master</code>字段去除。</p>
+<p>然后编辑博客根目录下的 <code>_config.yml</code>，修改第100行（大概）为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">theme: maupassant</span><br></pre></td></tr></table></figure>
+
+<p>注意：<code>_config.yml</code> 文件中冒号后要空一个空格，否则可能报错。</p>
+<p>自此，主题安装完成。若要对应用后的主题进行修改，只需打开主题文件夹下的<code>_config.yml</code> 文件并根据偏好修改既可。</p>
+<h2 id="创建Github仓库"><a href="#创建Github仓库" class="headerlink" title="创建Github仓库"></a>创建Github仓库</h2><p>登录Github，单击头像 - Your repositories 然后在转跳后的页面中单击<code>new</code>。</p>
+<p>在<code>Repository name</code> 文本框中填写 <code>&lt;user_name&gt;.github.io</code> 。  <code>&lt;user_name&gt;.github.io</code>便是此后github pages的网址。其中<code>&lt;user_name&gt;</code>是你的Github用户名。</p>
+<p>务必勾选<code>Public</code> 。因为只有公共仓库能使用github pages。</p>
+<p>然后单击 <code>Create repository</code> 完成创建。</p>
+<h2 id="设置邮箱、用户名和公钥"><a href="#设置邮箱、用户名和公钥" class="headerlink" title="设置邮箱、用户名和公钥"></a>设置邮箱、用户名和公钥</h2><p>在git bash窗口中输入如下命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &lt;user_name&gt;</span><br><span class="line">git config --global user.email &lt;your_email&gt;</span><br></pre></td></tr></table></figure>
+
+<p>将&lt;…&gt;中的内容替换为你的github用户名和github账户注册时的邮箱。</p>
+<p>然后输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &lt;your_email&gt;</span><br></pre></td></tr></table></figure>
+
+<p>并按三次回车。</p>
+<p>之后使用VScode或系统自带的Notepad打开 <code>.ssh</code>文件夹（参考路径： <code>C:\Users\Administrator\.ssh</code>）下的 <code>id_rsa.pub</code> 文件，复制其内容。</p>
+<p>回到Github，单击用户头像 - Settings进入设置页面，然后单击 <code>SSH and GPG keys</code> ，在SSH Keys一栏的右侧单击 <code>New SSH key</code> ，将刚刚复制的内容粘贴到<code>Key</code>下方的文本框中，然后单击 <code>Add SSH key</code> 完成添加。</p>
+<h2 id="测试-1"><a href="#测试-1" class="headerlink" title="- 测试"></a>- 测试</h2><p>在git bash中输入</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+
+<p>如果返回</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hi &lt;github_user_name&gt;! You&#x27;ve successfully authenticated, but GitHub does not provide shell access.</span><br></pre></td></tr></table></figure>
+
+<p>则表明添加成功。</p>
+<h2 id="部署博客到Github"><a href="#部署博客到Github" class="headerlink" title="部署博客到Github"></a>部署博客到Github</h2><p>打开博客根目录下的 <code>_config.yml</code> 文件，在最下方做修改</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: </span><br><span class="line">    git@github.com:&lt;user_name&gt;/&lt;user_name&gt;.github.io.git </span><br><span class="line">  branch: main</span><br></pre></td></tr></table></figure>
+
+<p>注意将&lt;…&gt;中的内容替换为你的github用户名。或者在仓库页面单击code - Local - SSH单击复制按钮得到该内容。</p>
+<p>然后在git bash中安装<code>deploy-git</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<p>完事具备，下面开始部署博客。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean ##该命令用于清除之前生成过的东西，即根目录下的public文件夹内容。</span><br><span class="line">hexo generate ##生成博客。以可以使用简化命令hexo g</span><br><span class="line">hexo deploy ##部署博客。也可以使用简化命令hexo d</span><br></pre></td></tr></table></figure>
+
+<p>或使用一串命令集</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean -g -d</span><br></pre></td></tr></table></figure>
+
+<p>首次部署需要登录Github。在弹出的小窗口中根据提示输入用户密码既可。</p>
+<p>若无报错信息且提出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INFO  Deploy done: git</span><br></pre></td></tr></table></figure>
+
+<p>则表明部署完成。在浏览器中输入 <code>&lt;user_name&gt;.github.io</code> 即可登录你的博客。</p>
+<h2 id="设置自定义域名"><a href="#设置自定义域名" class="headerlink" title="设置自定义域名"></a>设置自定义域名</h2><p>你也可以使用自定义域名。在阿里云等网站上可以购买并注册自己的域名（略）。</p>
+<p>以阿里云为例。</p>
+<h2 id="使用swiftype搜索引擎"><a href="#使用swiftype搜索引擎" class="headerlink" title="使用swiftype搜索引擎"></a>使用swiftype搜索引擎</h2><h2 id="部署到vercel上"><a href="#部署到vercel上" class="headerlink" title="部署到vercel上"></a>部署到vercel上</h2><p>未完待续</p>
 </div><div class="tags"><ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GithubPages/" rel="tag">GithubPages</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" rel="tag">个人博客</a></li></ul></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><input class="st-default-search-input" placeholder="Search" type="text"/></div><div class="widget"><div class="author-info"><a class="info-avatar" href="/about/" title="关于"><img class="nofancybox" src="/img/new_avatar.png"/></a><p></p></div></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/GithubPages/" style="font-size: 15px;">GithubPages</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" style="font-size: 15px;">个人博客</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2023/08/15/Hexo-GithubPages-Vercel%E6%95%99%E7%A8%8B-%E6%9E%84%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E7%AB%99/">Hexo+GithubPages/Vercel教程|构建个人博客站</a></li></ul></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2023 <a href="/." rel="nofollow">BlankChen.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=1.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/latest/jquery.fancybox.min.js"></script><script type="text/javascript" src="/js/fancybox.js?v=1.0.0"></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/latest/jquery.fancybox.min.css"><script>(function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
 (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
 e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
