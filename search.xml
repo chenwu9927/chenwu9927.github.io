@@ -13,96 +13,6 @@
       </tags>
   </entry>
   <entry>
-    <title>2024年美赛</title>
-    <url>/2024/02/07/</url>
-    <content><![CDATA[<p><strong>2024年5月更新</strong></p>
-<p>最后是<strong>Honorable Winner</strong>.</p>
-<hr>
-<p><strong>以下是原文：</strong></p>
-<blockquote>
-<p>回家后就没怎么学，四天时间三个人随便做了做，本来已经打算开摆了，编程建模写论文都粘点。  好歹是场比赛，这几日一直为之心力憔悴，开个贴记录一下。下面是论文部分内容。</p>
-</blockquote>
-<h2 id="Too-close-to-call-The-Impact-of-Momentum-Changes"><a href="#Too-close-to-call-The-Impact-of-Momentum-Changes" class="headerlink" title="Too close to call? The Impact of Momentum Changes"></a>Too close to call? The Impact of Momentum Changes</h2><h3 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h3><p>In an intense tennis match, even a world-renowned and experienced veteran may fail to grasp the momentary reversal of the situation and lose miserably. Thus, capturing the factors affecting match points and situation changes, and verifying the potential momentum effects that may exist in a match are of great significance in improving the athletes’ ability to cope with the match as well as formulating the next sentence of the match strategy. Starting from this phenomenon, this paper constructs a series of models to model players’ performance as well as momentum, and to verify the impact that different factors may have on the situation.</p>
-<p>Before the modeling begins, through the analysis and preprocessing of the tennis match data in the annex Wimbledon-featured matches, we consider the relevant factors and normalize them, so as to facilitate the subsequent processing and quantification of the data.</p>
-<p>For problem 1, as the opening question of this modeling exercise, we need to find the factors related to ”performance”, build a corresponding model, and visualize the performance of the athletes and the process of the game. We use several classification models for testing, select the best one, and then use accuracy, recall, precision and other indicators to conduct in-depth testing and evaluation of the model, and finally visualize the performance of athletes.</p>
-<p>For problem 2, this paper mainly quantifies the index of ”momentum”, transforms the model from a theoretical existence of material into a part that can be practically solved, so as to compare it with the results of the game obtained in the previous question, and judge whether the index of ”momentum” is random or not. We compare it with the results of the previous question to determine whether the indicator ”momentum” is random or not. For this model, we firstly use the entropy weight method to determine the weight of each variable that may affect the momentum, and then use the Spearman correlation analysis to determine the degree of influence of the ”momentum” on the game, in addition, we carry out the S-W test and the K-S test on the index, and then we determine whether the swing and the success of the game are random or not.</p>
-<p>In addition, the S-W test and the K-S test were performed on the indicators, and in summary, it was determined whether the swing and success in the game were randomized, which further proved that there was a certain influence of ”momentum” by proving that the selected variables did not satisfy the randomness distribution. In this problem, the result of correlation analysis is 0.334, which can show that there is a weak correlation between ”momentum” and the result of the game, which has a certain influence on the result, not random as the coach said.</p>
-<p>For question three, the focus is to establish a model to predict the fluctuation of the game, this paper is based on the previous two questions, through the logistic regression to obtain the conversion point of the performance function, so as to determine the key moment of the situation change, and use the KNN method and the BP neural network to support the evidence. Finally, the data of multi-set matches are used to inversely verify the effectiveness of the model. For the determination of the most relevant factors, a combination of metrics derived from the first two questions is used and a heat analysis graph of the correlation is given. Recommendations are finally given based on those metrics, aiming to provide insight into the player’s momentum changes in different match situations and support for future matches.</p>
-<p><strong>Keywords: Machine Learning, Momentum, Correlation Analysis, Entropy Weighting Method, Logistic Regression</strong></p>
-<h3 id="Model-Overview"><a href="#Model-Overview" class="headerlink" title="Model Overview"></a>Model Overview</h3><p>Specifically, our work is organized in the following order:</p>
-<p>First, we preprocessed the dataset and selected&#x2F;constructed 14 variables for modeling. We selected the XGboost classification model with the best predictive performance from several methods for modeling, and the trained model can predict whether a player will perform well or poorly at a given moment based on the given 14 variables.</p>
-<p>Then, we consider the possible impact of momentum on the game trend, select the key six variables to construct the momentum function, and combine with the entropy weighting method to get the variable weights by calculating the impact of the selected indicators on the game scores; in addition, the indicators are subjected to the S-W test and the K-S test, and synthesized to determine whether the swings and successes in the game are random or not.</p>
-<p>Third, we set out on the basis of the first two steps , through the logistic regression method to obtain the key thresholds of the performance function, modeling the performance of the players to get the specific moments of the situation shift, combined with the amount of change in the momentum of the players to determine the dominant side.</p>
-<p>Finally, we analyze, validate and evaluate the constructed model.</p>
-<p><img src="/2024/02/07/ourwork.jpg" alt="Our Work"></p>
-<h3 id="Task-1"><a href="#Task-1" class="headerlink" title="Task 1"></a>Task 1</h3><p><img src="/2024/02/07/modelcmp.png"></p>
-<p>![ROC Curve](ROC Curve.jpg)</p>
-<p><img src="/2024/02/07/pef.png"></p>
-<p><img src="/2024/02/07/1.jpg"></p>
-<p><img src="/2024/02/07/2.jpg"></p>
-<h3 id="Task-2"><a href="#Task-2" class="headerlink" title="Task 2"></a>Task 2</h3><p>复制到md里不太方便，直接贴图片</p>
-<p><img src="/2024/02/07/121.png"></p>
-<p><img src="/2024/02/07/122.png"></p>
-<p><img src="/2024/02/07/123.png"></p>
-<p><img src="/2024/02/07/124.png"></p>
-<h3 id="Task-3"><a href="#Task-3" class="headerlink" title="Task 3"></a>Task 3</h3><p><img src="/2024/02/07/131.png"></p>
-<p><img src="/2024/02/07/132.png"></p>
-<h3 id="meme"><a href="#meme" class="headerlink" title="meme"></a>meme</h3><blockquote>
-<p>To: Darren Cahill and other great tennis coaches</p>
-<p>From the team: 2430080</p>
-<p>Date: February 6, 2024</p>
-<p>Subject: Analysis of article and strategies for further research</p>
-<p>In today’s tennis world, in addition to improving the technical and physical conditioning of the players, it is also very important to optimize the players’ game conditioning so that they can win at the right time with a bang or rationalize their own physical strength. In this article, we aim to quantify the factor of ”momentum” and identify its important role in the game, so as to formulate appropriate strategies for your reference and use in your work.</p>
-<p>By sifting through some of the Wimbledon Grand Slam match data, such as scores, serves, points, errors, etc., our team has developed a process and metrics that can be used to analyze and predict a player’s form over time, which will help you determine which metrics have the greatest impact on a player’s ”momentum” and form. We will walk you through the specifics of how to do this analysis and provide you with further specific recommendations.</p>
-<p>Our methodology :</p>
-<p>We used a machine learning model, with a focus on the xgboost model to process the data.</p>
-<ul>
-<li>using the xgboost model in the ROC curve to draw, ROC curve refers to receiver operating characteristic curve, is to reflect the sensitivity and specificity of the continuous variables of the composite index. The curve is drawn with sensitivity as the vertical coordinate and specificity as the horizontal coordinate, and the larger the area under the curve, the higher the diagnostic accuracy. On the ROC curve, the point closest to the upper left of the coordinate graph is the critical value where both sensitivity and specificity are high.</li>
-<li>Standardize and normalize the needed indicators, and represent the serve, score, error, and net in a normalized way, so as to facilitate the comparison and processing. Then using the model of logistic regression, we predicted our model, and came up with some fluctuations in the game at the point of time with the current emergence of the world, and give the prediction.</li>
-</ul>
-<p>Findings and Recommendations of the Study :</p>
-<ul>
-<li>in the process of the game, if the opponent has a continuous score, a period of time more winning points, more points in front of the net and other indicators with a strong correlation with the ”momentum”, should be timely proposed pause, slow down the opponent’s offensive rhythm.</li>
-<li>in the game, should be based on the characteristics of different opponents to take different tactics. When facing the opponent with strong explosive power and fierce offense, you can properly avoid his front, save energy, and start to make efforts to beat the opponent when his ”momentum” appears to be declining. If you are facing an opponent with low momentum in the opening round, you can score consecutive points to keep his momentum low and beat him quickly.</li>
-</ul>
-<p>Our long-term recommendations are as follows:</p>
-<ul>
-<li>In normal training, the quality of serve and the scoring rate should be further improved. According to the model, the serve has a greater impact on the player’s ”momentum” and scoring, so it should be practiced more often.</li>
-<li>should be carried out on the player pressure training and psychological counseling and<br>other measures, to avoid the ”momentum” brought about by the decline of the economic level of a substantial decline. At the same time, we should analyze the time period for the player to enter the state, and extend or change it appropriately.</li>
-</ul>
-<p>We thank you for your time and consideration, and hope that you will adopt our suggestions so that more players can realize their talents and become stronger. </p>
-<p>Sincerely</p>
-<p>Team 2430080</p>
-</blockquote>
-]]></content>
-  </entry>
-  <entry>
-    <title>关于宋庆龄</title>
-    <url>/2022/04/03/</url>
-    <content><![CDATA[<p>下了什刹海站，穿越狭长的胡同，就来到了后海。沿着岸边走约百米，便是宋庆龄故居。春和景明，波澜不兴。我们来到这里的时候，路人笑着和我们说，院里的西府海棠正开得茂盛。 </p>
-<p>宋庆龄在北京的居所十分静谧。江南的假山、流水、小桥，北方迂回的长亭、宽敞的院落，摇曳的枝条与细碎的阳光，一切都结合得恰到好处。 </p>
-<p>在展馆的中央，是宋庆龄与孙中山的合影。四周陈满了信件和手稿。我被这样一句话吸引了：</p>
-<blockquote>
-<p>我是幸福的，我想尽量帮助我的丈夫处理英文信件。……对我来说，结婚就好像进了学校一样，不过没有烦人的“考试”罢了。  ——宋庆龄 </p>
-</blockquote>
-<p>通过阅读回忆录以及展品摘要，我们得知：在长期的相处和共同战斗之中，宋庆龄与孙中山坠入了爱河，甚至不顾父母的反对，逃离软禁。巨大的年龄差异没能成为他们爱情的鸿沟，他们携手走向永恒。 </p>
-<p>孙中山送给宋庆龄的定情信物是一把小巧精致的手枪，她一直携带在身上。如今在展台上依旧熠熠生辉。 </p>
-<p>1925 年，孙中山在北京逝世，她陷入了巨大的悲恸之中，但却没有因此消沉。在一年后的国民党二大上，发表了坚持孙中山三大政策的演说。她接续过丈夫身上的重担，继续为中国人民的民主与自由、和平与发展奋斗着。宋庆龄为了丈夫的遗愿，再次踏上了旅居欧洲的行程。她访问了莫斯科，寻求革命道路，在前苏联和欧洲求学，与友人积极探讨革命理论。 </p>
-<p>宋庆龄为革命事业、和平事业和妇女儿童福利事业奋斗了终生。和孙中山一样，宋庆龄庆龄在国外接受了现代化的教育，萌生了先进的思想，在很多方面与孙中山先生相投。二人并不受封建思想观念的束缚，彼此奔赴成为眷属。早年，她谨慎热情地帮助孙中山先生处理各项事务，照顾他的生活，甚至是在危难关头毫不犹豫地挡在他地身前。体贴周到使得他得以安心的工作。在孙中山病逝后，她依然秉承着丈夫的志向，走向时代的风暴之眼。 </p>
-<p>回顾宋庆龄先生的一生，我们很难不从中得到启迪。宋庆龄先生有着一颗赤诚的心，一是对自己的丈夫忠诚，她同他一起战斗，为他仕病、完成了他的遗愿；二是对华夏民族赤城。不论我们将目光投向哪个时间节点，宋庆龄先生永远是同中华民族的利益站在一起的，她总是不顾自己的安危，在骤变之时勇敢地批判、指责走向歧途的国民党，她所做的一切，都是为了让百姓免受苦难，让主权得以保证。 </p>
-<p>出了展馆，再往前走十几米，就是和平鸽舍。宋庆龄先生享誉世界的另一个原因，便是她长期担任大量教育、妇女儿童等方面福利活动的要职，奔赴世界各地、前往第三世界的国家进行交流，成立大量基金会，矢志不渝地为中国和平乃至世界和平奋斗着。 </p>
-<p>一名女性能在这样纷乱复杂、风起云涌的时代做出如此之多的贡献，是很难想象的。 </p>
-<p>1981年5 月29日，民主与和平的斗士最终陨落了。她的故事、信件、手稿、画像、物件等被后人妥善地保存了下来，存放在这里，向公众展览。这里成为了一个爱国主义教育基地。 </p>
-<p>心中但有信念，无处不放光芒。 </p>
-<p><img src="/2022/04/03/SongAndSun.jpg"></p>
-<p>2022年4月于北京</p>
-]]></content>
-      <tags>
-        <tag>宋庆龄</tag>
-        <tag>生活随想</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Data Analysis-Week9~week13</title>
     <url>/2023/05/15/</url>
     <content><![CDATA[<h1 id="Week-9"><a href="#Week-9" class="headerlink" title="Week 9"></a>Week 9</h1><blockquote>
@@ -240,6 +150,96 @@
       </tags>
   </entry>
   <entry>
+    <title>2024年美赛</title>
+    <url>/2024/02/07/</url>
+    <content><![CDATA[<p><strong>2024年5月更新</strong></p>
+<p>最后是<strong>Honorable Winner</strong>.</p>
+<hr>
+<p><strong>以下是原文：</strong></p>
+<blockquote>
+<p>回家后就没怎么学，四天时间三个人随便做了做，本来已经打算开摆了，编程建模写论文都粘点。  好歹是场比赛，这几日一直为之心力憔悴，开个贴记录一下。下面是论文部分内容。</p>
+</blockquote>
+<h2 id="Too-close-to-call-The-Impact-of-Momentum-Changes"><a href="#Too-close-to-call-The-Impact-of-Momentum-Changes" class="headerlink" title="Too close to call? The Impact of Momentum Changes"></a>Too close to call? The Impact of Momentum Changes</h2><h3 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h3><p>In an intense tennis match, even a world-renowned and experienced veteran may fail to grasp the momentary reversal of the situation and lose miserably. Thus, capturing the factors affecting match points and situation changes, and verifying the potential momentum effects that may exist in a match are of great significance in improving the athletes’ ability to cope with the match as well as formulating the next sentence of the match strategy. Starting from this phenomenon, this paper constructs a series of models to model players’ performance as well as momentum, and to verify the impact that different factors may have on the situation.</p>
+<p>Before the modeling begins, through the analysis and preprocessing of the tennis match data in the annex Wimbledon-featured matches, we consider the relevant factors and normalize them, so as to facilitate the subsequent processing and quantification of the data.</p>
+<p>For problem 1, as the opening question of this modeling exercise, we need to find the factors related to ”performance”, build a corresponding model, and visualize the performance of the athletes and the process of the game. We use several classification models for testing, select the best one, and then use accuracy, recall, precision and other indicators to conduct in-depth testing and evaluation of the model, and finally visualize the performance of athletes.</p>
+<p>For problem 2, this paper mainly quantifies the index of ”momentum”, transforms the model from a theoretical existence of material into a part that can be practically solved, so as to compare it with the results of the game obtained in the previous question, and judge whether the index of ”momentum” is random or not. We compare it with the results of the previous question to determine whether the indicator ”momentum” is random or not. For this model, we firstly use the entropy weight method to determine the weight of each variable that may affect the momentum, and then use the Spearman correlation analysis to determine the degree of influence of the ”momentum” on the game, in addition, we carry out the S-W test and the K-S test on the index, and then we determine whether the swing and the success of the game are random or not.</p>
+<p>In addition, the S-W test and the K-S test were performed on the indicators, and in summary, it was determined whether the swing and success in the game were randomized, which further proved that there was a certain influence of ”momentum” by proving that the selected variables did not satisfy the randomness distribution. In this problem, the result of correlation analysis is 0.334, which can show that there is a weak correlation between ”momentum” and the result of the game, which has a certain influence on the result, not random as the coach said.</p>
+<p>For question three, the focus is to establish a model to predict the fluctuation of the game, this paper is based on the previous two questions, through the logistic regression to obtain the conversion point of the performance function, so as to determine the key moment of the situation change, and use the KNN method and the BP neural network to support the evidence. Finally, the data of multi-set matches are used to inversely verify the effectiveness of the model. For the determination of the most relevant factors, a combination of metrics derived from the first two questions is used and a heat analysis graph of the correlation is given. Recommendations are finally given based on those metrics, aiming to provide insight into the player’s momentum changes in different match situations and support for future matches.</p>
+<p><strong>Keywords: Machine Learning, Momentum, Correlation Analysis, Entropy Weighting Method, Logistic Regression</strong></p>
+<h3 id="Model-Overview"><a href="#Model-Overview" class="headerlink" title="Model Overview"></a>Model Overview</h3><p>Specifically, our work is organized in the following order:</p>
+<p>First, we preprocessed the dataset and selected&#x2F;constructed 14 variables for modeling. We selected the XGboost classification model with the best predictive performance from several methods for modeling, and the trained model can predict whether a player will perform well or poorly at a given moment based on the given 14 variables.</p>
+<p>Then, we consider the possible impact of momentum on the game trend, select the key six variables to construct the momentum function, and combine with the entropy weighting method to get the variable weights by calculating the impact of the selected indicators on the game scores; in addition, the indicators are subjected to the S-W test and the K-S test, and synthesized to determine whether the swings and successes in the game are random or not.</p>
+<p>Third, we set out on the basis of the first two steps , through the logistic regression method to obtain the key thresholds of the performance function, modeling the performance of the players to get the specific moments of the situation shift, combined with the amount of change in the momentum of the players to determine the dominant side.</p>
+<p>Finally, we analyze, validate and evaluate the constructed model.</p>
+<p><img src="/2024/02/07/ourwork.jpg" alt="Our Work"></p>
+<h3 id="Task-1"><a href="#Task-1" class="headerlink" title="Task 1"></a>Task 1</h3><p><img src="/2024/02/07/modelcmp.png"></p>
+<p>![ROC Curve](ROC Curve.jpg)</p>
+<p><img src="/2024/02/07/pef.png"></p>
+<p><img src="/2024/02/07/1.jpg"></p>
+<p><img src="/2024/02/07/2.jpg"></p>
+<h3 id="Task-2"><a href="#Task-2" class="headerlink" title="Task 2"></a>Task 2</h3><p>复制到md里不太方便，直接贴图片</p>
+<p><img src="/2024/02/07/121.png"></p>
+<p><img src="/2024/02/07/122.png"></p>
+<p><img src="/2024/02/07/123.png"></p>
+<p><img src="/2024/02/07/124.png"></p>
+<h3 id="Task-3"><a href="#Task-3" class="headerlink" title="Task 3"></a>Task 3</h3><p><img src="/2024/02/07/131.png"></p>
+<p><img src="/2024/02/07/132.png"></p>
+<h3 id="meme"><a href="#meme" class="headerlink" title="meme"></a>meme</h3><blockquote>
+<p>To: Darren Cahill and other great tennis coaches</p>
+<p>From the team: 2430080</p>
+<p>Date: February 6, 2024</p>
+<p>Subject: Analysis of article and strategies for further research</p>
+<p>In today’s tennis world, in addition to improving the technical and physical conditioning of the players, it is also very important to optimize the players’ game conditioning so that they can win at the right time with a bang or rationalize their own physical strength. In this article, we aim to quantify the factor of ”momentum” and identify its important role in the game, so as to formulate appropriate strategies for your reference and use in your work.</p>
+<p>By sifting through some of the Wimbledon Grand Slam match data, such as scores, serves, points, errors, etc., our team has developed a process and metrics that can be used to analyze and predict a player’s form over time, which will help you determine which metrics have the greatest impact on a player’s ”momentum” and form. We will walk you through the specifics of how to do this analysis and provide you with further specific recommendations.</p>
+<p>Our methodology :</p>
+<p>We used a machine learning model, with a focus on the xgboost model to process the data.</p>
+<ul>
+<li>using the xgboost model in the ROC curve to draw, ROC curve refers to receiver operating characteristic curve, is to reflect the sensitivity and specificity of the continuous variables of the composite index. The curve is drawn with sensitivity as the vertical coordinate and specificity as the horizontal coordinate, and the larger the area under the curve, the higher the diagnostic accuracy. On the ROC curve, the point closest to the upper left of the coordinate graph is the critical value where both sensitivity and specificity are high.</li>
+<li>Standardize and normalize the needed indicators, and represent the serve, score, error, and net in a normalized way, so as to facilitate the comparison and processing. Then using the model of logistic regression, we predicted our model, and came up with some fluctuations in the game at the point of time with the current emergence of the world, and give the prediction.</li>
+</ul>
+<p>Findings and Recommendations of the Study :</p>
+<ul>
+<li>in the process of the game, if the opponent has a continuous score, a period of time more winning points, more points in front of the net and other indicators with a strong correlation with the ”momentum”, should be timely proposed pause, slow down the opponent’s offensive rhythm.</li>
+<li>in the game, should be based on the characteristics of different opponents to take different tactics. When facing the opponent with strong explosive power and fierce offense, you can properly avoid his front, save energy, and start to make efforts to beat the opponent when his ”momentum” appears to be declining. If you are facing an opponent with low momentum in the opening round, you can score consecutive points to keep his momentum low and beat him quickly.</li>
+</ul>
+<p>Our long-term recommendations are as follows:</p>
+<ul>
+<li>In normal training, the quality of serve and the scoring rate should be further improved. According to the model, the serve has a greater impact on the player’s ”momentum” and scoring, so it should be practiced more often.</li>
+<li>should be carried out on the player pressure training and psychological counseling and<br>other measures, to avoid the ”momentum” brought about by the decline of the economic level of a substantial decline. At the same time, we should analyze the time period for the player to enter the state, and extend or change it appropriately.</li>
+</ul>
+<p>We thank you for your time and consideration, and hope that you will adopt our suggestions so that more players can realize their talents and become stronger. </p>
+<p>Sincerely</p>
+<p>Team 2430080</p>
+</blockquote>
+]]></content>
+  </entry>
+  <entry>
+    <title>关于宋庆龄</title>
+    <url>/2022/04/03/</url>
+    <content><![CDATA[<p>下了什刹海站，穿越狭长的胡同，就来到了后海。沿着岸边走约百米，便是宋庆龄故居。春和景明，波澜不兴。我们来到这里的时候，路人笑着和我们说，院里的西府海棠正开得茂盛。 </p>
+<p>宋庆龄在北京的居所十分静谧。江南的假山、流水、小桥，北方迂回的长亭、宽敞的院落，摇曳的枝条与细碎的阳光，一切都结合得恰到好处。 </p>
+<p>在展馆的中央，是宋庆龄与孙中山的合影。四周陈满了信件和手稿。我被这样一句话吸引了：</p>
+<blockquote>
+<p>我是幸福的，我想尽量帮助我的丈夫处理英文信件。……对我来说，结婚就好像进了学校一样，不过没有烦人的“考试”罢了。  ——宋庆龄 </p>
+</blockquote>
+<p>通过阅读回忆录以及展品摘要，我们得知：在长期的相处和共同战斗之中，宋庆龄与孙中山坠入了爱河，甚至不顾父母的反对，逃离软禁。巨大的年龄差异没能成为他们爱情的鸿沟，他们携手走向永恒。 </p>
+<p>孙中山送给宋庆龄的定情信物是一把小巧精致的手枪，她一直携带在身上。如今在展台上依旧熠熠生辉。 </p>
+<p>1925 年，孙中山在北京逝世，她陷入了巨大的悲恸之中，但却没有因此消沉。在一年后的国民党二大上，发表了坚持孙中山三大政策的演说。她接续过丈夫身上的重担，继续为中国人民的民主与自由、和平与发展奋斗着。宋庆龄为了丈夫的遗愿，再次踏上了旅居欧洲的行程。她访问了莫斯科，寻求革命道路，在前苏联和欧洲求学，与友人积极探讨革命理论。 </p>
+<p>宋庆龄为革命事业、和平事业和妇女儿童福利事业奋斗了终生。和孙中山一样，宋庆龄庆龄在国外接受了现代化的教育，萌生了先进的思想，在很多方面与孙中山先生相投。二人并不受封建思想观念的束缚，彼此奔赴成为眷属。早年，她谨慎热情地帮助孙中山先生处理各项事务，照顾他的生活，甚至是在危难关头毫不犹豫地挡在他地身前。体贴周到使得他得以安心的工作。在孙中山病逝后，她依然秉承着丈夫的志向，走向时代的风暴之眼。 </p>
+<p>回顾宋庆龄先生的一生，我们很难不从中得到启迪。宋庆龄先生有着一颗赤诚的心，一是对自己的丈夫忠诚，她同他一起战斗，为他仕病、完成了他的遗愿；二是对华夏民族赤城。不论我们将目光投向哪个时间节点，宋庆龄先生永远是同中华民族的利益站在一起的，她总是不顾自己的安危，在骤变之时勇敢地批判、指责走向歧途的国民党，她所做的一切，都是为了让百姓免受苦难，让主权得以保证。 </p>
+<p>出了展馆，再往前走十几米，就是和平鸽舍。宋庆龄先生享誉世界的另一个原因，便是她长期担任大量教育、妇女儿童等方面福利活动的要职，奔赴世界各地、前往第三世界的国家进行交流，成立大量基金会，矢志不渝地为中国和平乃至世界和平奋斗着。 </p>
+<p>一名女性能在这样纷乱复杂、风起云涌的时代做出如此之多的贡献，是很难想象的。 </p>
+<p>1981年5 月29日，民主与和平的斗士最终陨落了。她的故事、信件、手稿、画像、物件等被后人妥善地保存了下来，存放在这里，向公众展览。这里成为了一个爱国主义教育基地。 </p>
+<p>心中但有信念，无处不放光芒。 </p>
+<p><img src="/2022/04/03/SongAndSun.jpg"></p>
+<p>2022年4月于北京</p>
+]]></content>
+      <tags>
+        <tag>宋庆龄</tag>
+        <tag>生活随想</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>关于梦境</title>
     <url>/1900/01/01/</url>
     <content><![CDATA[<p><code>先让时间无限倒退！此处标注的时间是计算机能够表示的最早时刻。这篇博文记录的文字没有经过加工，大多是我在半梦半醒的状态下记录下来的，读起来并不通顺。</code></p>
@@ -254,6 +254,42 @@
       <tags>
         <tag>记录册</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>半年志</title>
+    <url>/2024/06/25/</url>
+    <content><![CDATA[<p>时间过得真快啊！还来不及为春节题文，一眨眼已是年中了。</p>
+<blockquote>
+<p><em>这一学期所学的课程，…</em></p>
+</blockquote>
+<p> 能够掌握专业知识和技能，必然是极好的。只是，在我愈发的深入了解██这个专业后，我逐渐产生了逃离感，愈发地向自己发问：这真的是我想要的生活吗？又或许从高考填志愿就已经注定了。我在大二的时候有过转专业的想法，但最终还是为了一年的沉没成本想着暂且读下去。这份遗憾自高考录取起，雪藏了三年，兜兜转转又回到了原点。直至癸卯年腊月的某一个下午，初见██的那怦然心动的一刻，我心里大抵也有了想法——████。但囿于21级各大改革的阵痛，这一个学期的复习并不顺利。毕竟要学许许多多新的东西。眼下繁多的课程及学校布置的任务，以及突然延长的强制生产实习，留给我复习的时间已经不多了。</p>
+<p> 最后，回顾整个学期。2024年悄然过半，又到了写半年志的时候。真正地提起了笔，静待思绪涌现，沉默良久后又作罢。依旧是兵荒马乱的半年，曾几何时，我耗费了太多的时间在一些或有意义或无意义的事情上。悟已往之不谏，知来者之可追。既然选择了这条路，就应当坚定走下去，何必欸奈路途艰难。希望馀下的这半年岁月里我们都能成长成为更好的人，“縱浪大化裡，不喜亦不懼”。</p>
+<p>甲辰年庚午月于北京</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>抓住2023的小尾巴</title>
+    <url>/2023/12/31/</url>
+    <content><![CDATA[<p>一眨眼2023居然马上就要结束了。我在慌乱之中拿起了笔，总想写些什么，沉默良久后又作罢。</p>
+<p>一个荒诞的考期，一个兵荒马乱的周末。曾几何时，我耗费了太多的时间在一些或有意义或无意义的事情上。来到这里两年有余，却依旧难以洗去当初的锐气。我想做许许多多的事，见识许许多多的人，只可惜2023将要过去，我只能存有遗憾地等待又一年了。</p>
+<p>惊险、多梦、神奇，是我在这一年末留存的最后念头。期待新的一年里我们都能成长成为更好的人，縱浪大化裡，不喜亦不懼。</p>
+<p>谨以此文，纪念我的2023.</p>
+]]></content>
+      <tags>
+        <tag>生活</tag>
+        <tag>随想</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>最后一堂课</title>
+    <url>/2023/12/10/</url>
+    <content><![CDATA[<blockquote>
+<p>工程数学导论，张老师很喜欢Gilbert strang。 他说我们可以不去上他的课，能去ocw mit看Gilbert strang的课更好。</p>
+<p>Gilbert Strang有着独特的魅力，不光是张老师，世人都很崇拜他。 然后同样是最后一堂课，老师采取了同样的结课方式来向他致敬。BTW, Gilbert在前段时间退休了。</p>
+<p>不过，这个教室还是太旧了，我觉得其实可以换一个教室的，拍照效果会更好一些 （</p>
+</blockquote>
+<p><img src="/2023/12/10/classmit.jpg" alt="mit"></p>
+]]></content>
   </entry>
   <entry>
     <title>寻书</title>
@@ -303,42 +339,6 @@
       </tags>
   </entry>
   <entry>
-    <title>半年志</title>
-    <url>/2024/06/25/</url>
-    <content><![CDATA[<p>时间过得真快啊！还来不及为春节题文，一眨眼已是年中了。</p>
-<blockquote>
-<p><em>这一学期所学的课程，…</em></p>
-</blockquote>
-<p> 能够掌握专业知识和技能，必然是极好的。只是，在我愈发的深入了解██这个专业后，我逐渐产生了逃离感，愈发地向自己发问：这真的是我想要的生活吗？又或许从高考填志愿就已经注定了。我在大二的时候有过转专业的想法，但最终还是为了一年的沉没成本想着暂且读下去。这份遗憾自高考录取起，雪藏了三年，兜兜转转又回到了原点。直至癸卯年腊月的某一个下午，初见██的那怦然心动的一刻，我心里大抵也有了想法——████。但囿于21级各大改革的阵痛，这一个学期的复习并不顺利。毕竟要学许许多多新的东西。眼下繁多的课程及学校布置的任务，以及突然延长的强制生产实习，留给我复习的时间已经不多了。</p>
-<p> 最后，回顾整个学期。2024年悄然过半，又到了写半年志的时候。真正地提起了笔，静待思绪涌现，沉默良久后又作罢。依旧是兵荒马乱的半年，曾几何时，我耗费了太多的时间在一些或有意义或无意义的事情上。悟已往之不谏，知来者之可追。既然选择了这条路，就应当坚定走下去，何必欸奈路途艰难。希望馀下的这半年岁月里我们都能成长成为更好的人，“縱浪大化裡，不喜亦不懼”。</p>
-<p>甲辰年庚午月于北京</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>抓住2023的小尾巴</title>
-    <url>/2023/12/31/</url>
-    <content><![CDATA[<p>一眨眼2023居然马上就要结束了。我在慌乱之中拿起了笔，总想写些什么，沉默良久后又作罢。</p>
-<p>一个荒诞的考期，一个兵荒马乱的周末。曾几何时，我耗费了太多的时间在一些或有意义或无意义的事情上。来到这里两年有余，却依旧难以洗去当初的锐气。我想做许许多多的事，见识许许多多的人，只可惜2023将要过去，我只能存有遗憾地等待又一年了。</p>
-<p>惊险、多梦、神奇，是我在这一年末留存的最后念头。期待新的一年里我们都能成长成为更好的人，縱浪大化裡，不喜亦不懼。</p>
-<p>谨以此文，纪念我的2023.</p>
-]]></content>
-      <tags>
-        <tag>生活</tag>
-        <tag>随想</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>最后一堂课</title>
-    <url>/2023/12/10/</url>
-    <content><![CDATA[<blockquote>
-<p>工程数学导论，张老师很喜欢Gilbert strang。 他说我们可以不去上他的课，能去ocw mit看Gilbert strang的课更好。</p>
-<p>Gilbert Strang有着独特的魅力，不光是张老师，世人都很崇拜他。 然后同样是最后一堂课，老师采取了同样的结课方式来向他致敬。BTW, Gilbert在前段时间退休了。</p>
-<p>不过，这个教室还是太旧了，我觉得其实可以换一个教室的，拍照效果会更好一些 （</p>
-</blockquote>
-<p><img src="/2023/12/10/classmit.jpg" alt="mit"></p>
-]]></content>
-  </entry>
-  <entry>
     <title>瑞雪兆丰年</title>
     <url>/2023/12/12/</url>
     <content><![CDATA[<blockquote>
@@ -346,6 +346,23 @@
 <p>语出曲波《桥隆飙》十九：“俗语道：‘瑞雪兆丰年’，小麦一定收成好。”</p>
 </blockquote>
 <p><img src="/2023/12/12/heavysnow.jpg" alt="新北居民眼中的雪"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>浪迹天涯</title>
+    <url>/2024/07/29/</url>
+    <content><![CDATA[<p>这一个月来的实习真是令人心力憔悴，渐而使我愈发地有了逃离感。每天面对着堆积如山的实习工作和学习任务，我仿佛被压在巨石下的蚂蚁，挣扎着寻找一丝透气的空间。</p>
+<p>不得不承认中█████研究院确实是一个大佬云集的地方，这里齐聚着各式各样人才，只是茶余饭后片刻的随想便已是我无法企及的高度。只可惜，每个人都是忙忙碌碌的，却又充满了希望，唯独我。</p>
+<p>我总是一遍又一遍的思考着自己究竟想要什么——我并不是一个逆来顺受、安于现状的人，我仿佛就不是industrial engineering专业的人，更不是一个称手的研究助理：这不是理想中的生活，我只想跳出当下的圈子。</p>
+<p>实习+学习的双重任务压得我喘不过气。我开始怀疑自己的选择，开始质疑自己的能力，甚至开始害怕面对未来。是否真的有勇气面对失败，就此，<strong>浪迹天涯</strong>，无人理解。</p>
+<p>寂寞与孤独，是亘古不变的主题。</p>
+<p>我只是一个微不足道的存在，一个在这个世界上挣扎求生的普通人。才刚踏上心灵的摆渡之旅，希望小小浪花不至将我吹翻，也不至触及礁石、湮入大海。</p>
+<p>倘若我真的就这样开始了流浪，我将不再被那些无形的枷锁束缚。我将放下那些曾经让我窒息的期望和责任，去追寻那些真正让我心动的事物。我会走过繁华的城市，也会穿越寂静的乡村；我会在星空下许下愿望，也会在暴风雨中寻找庇护。</p>
+<p>但也许，我将一直孤独地行走，直到世界的尽头。那时，我或许会明白，真正的自由不是逃避，而是在面对生活的重压时，依然能够保持内心的平静和坚定。</p>
+<p>我会写下我的所见所闻；我会，</p>
+<blockquote>
+<p>浪迹天涯。</p>
+</blockquote>
 ]]></content>
   </entry>
   <entry>
