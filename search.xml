@@ -14,6 +14,497 @@ Lazy sunny day ~ ~
       </tags>
   </entry>
   <entry>
+    <title>2024年美赛</title>
+    <url>/2024/02/07/2150/</url>
+    <content><![CDATA[2024年5月更新
+最后是Honorable Winner.
+
+以下是原文：
+
+回家后就没怎么学，四天时间三个人随便做了做，本来已经打算开摆了，编程建模写论文都粘点。  好歹是场比赛，这几日一直为之心力憔悴，开个贴记录一下。下面是论文部分内容。
+
+Too close to call? The Impact of Momentum Changes in Tennis
+Problem Chosen: C
+2024 MCM&#x2F;ICM Summary Sheet
+Team Control Number: 2430080
+
+SummaryIn an intense tennis match, even a world-renowned and experienced veteran may fail to grasp a momentary reversal and lose. Therefore, identifying factors affecting match points and situation changes, and verifying the potential impact of momentum, is crucial for athletes to better manage matches and refine their strategies. This paper addresses this by constructing models to quantify player performance and momentum, and to analyze how various factors influence game situations.
+Before modeling, we preprocess the annexed Wimbledon match data, identifying and normalizing relevant factors for subsequent quantification.
+For Problem 1, as an initial step, we identify performance-related factors, build a corresponding model, and visualize athlete performance throughout the game. We test several classification models, selecting the best one based on accuracy, recall, precision, and other metrics, followed by performance visualization.
+Problem 2 primarily quantifies “momentum,” transforming it from a theoretical concept into a practical index. We compare this index with previous game results to determine if “momentum” is random. The entropy weight method is used to determine the weight of each variable affecting momentum, followed by Spearman correlation analysis to assess momentum’s influence on the game. Additionally, S-W and K-S tests are performed on the index to determine if game swings and successes are random. The fact that selected variables do not satisfy random distribution further supports a non-random, albeit weak ($0.334$ correlation), influence of “momentum” on game outcomes, refuting the coach’s skepticism.
+For Problem 3, the focus is on modeling game fluctuation. Building on the previous two problems, logistic regression is used to identify performance function conversion points, pinpointing key moments of situation change. The KNN method and BP neural network provide supporting evidence. The model’s effectiveness is cross-verified using multi-set match data. The most relevant factors are determined using combined metrics from the first two problems, and a correlation heatmap is presented. Recommendations derived from these metrics aim to provide insights into player momentum changes in different match situations and support future strategic planning.
+For Problem 4, the logistic regression model generally predicts game fluctuation well. We explore the model’s generalization and limitations from a variable selection perspective, considering metrics overlooked in other models, and propose potential improvements. For instance, enhancing generalization could make the model effective across different competitive sports, aiding athletes’ long-term preparation and physical health.
+Keywords: Machine Learning, Momentum, Correlation Analysis, Entropy Weighting Method, Logistic Regression
+
+1 Introduction1.1 BackgroundTennis, a sport demanding endurance, speed, and comprehensive athletic ability, has a rich history. Elite players like Roger Federer and Rafael Nadal combine quick reflexes and explosive power with stamina and stability. Explosiveness and quick reflexes ensure optimal positioning and decision-making for every shot. Endurance and muscle stability enable sustained high-intensity play while reducing injury risk. As a new generation of high-level players emerges and older champions age, there’s growing interest in whether “momentum” influences game trends, potentially mitigating physical decline or enabling tactical development to defeat opponents. Our team addresses this by processing known data, characterizing and correlating indicators, applying principal component analysis where suitable, and using machine learning to build models and draw conclusions. We use data from the initial games of the provided dataset, focusing on indicators such as serve, receive, score, and unforced errors.
+1.2 Restatement of the ProblemCurrently, the existence, quantification, and impact of an abstract indicator like “momentum” remain unclear, particularly how various game events create or change it. This article aims to optimize understanding by addressing the following problems:
+
+Analyze the game’s flow to determine when and to what extent a player performs better, establish evaluation criteria, and plot the player’s score curve.
+Assess whether the model obtained is random or demonstrates a significant relationship with “momentum,” thereby addressing coach skepticism.
+Identify moments when game momentum shifts between players and provide advice based on these insights.
+Evaluate the model’s applicability and limitations.
+
+2 Overview of basic definitions2.1 Rules of TennisTennis rules are complex, especially Grand Slam men’s singles scoring. A match is best-of-five sets. A set typically involves winning 6 games, but requires a two-game lead (e.g., 7-5 or tie-break at 6-6). In a game, a player needs four points to win, also with a two-point lead. Point scores are:
+
+0 points &#x3D; love
+1 point &#x3D; 15
+2 points &#x3D; 30
+3 points &#x3D; 40
+
+At $40-40$ (“Deuce”), a player must win two consecutive points to secure the game. Winning the first point gives “AD-in,” and winning the next wins the game. Losing the point returns the score to $40-40$.
+Serve is critical and requires separate analysis. Players alternate serving each game, with two service attempts per point. Failing to land the ball in the service area on both attempts results in a “double fault,” costing the server the point.
+2.2 the “Momentum” theoryThe “momentum” theory posits that in sports, gaining an advantage often leads to sustained success. This momentum can boost an athlete’s or team’s confidence and may also affect the opponent’s mental state.
+In tennis, an athlete who gains an advantage often maintains it, exerting psychological pressure on the opponent. This psychological edge can simultaneously motivate the advantaged player, leading to positive outcomes.
+Beyond psychological factors like self-confidence and opponent pressure, “momentum” can also be generated through strategic game management, such such as physical energy conservation or adapting to an opponent’s playing style.
+2.3 Model OverviewThe overall architecture of our model involves a three-fold task: constructing a model to quantify player performance at any given moment; modeling momentum and investigating its role in game swings and success; and applying the proposed model to a given match to test its performance.
+Our methodology proceeds as follows: First, we preprocess the dataset and select&#x2F;construct $14$ variables for modeling. Among several methods, the XGBoost classification model was chosen for its superior predictive performance. The trained model predicts whether a player will perform well or poorly at a given moment based on these $14$ variables. Second, to analyze momentum’s potential impact on game trends, we select six key variables to construct the momentum function. We use the entropy weighting method to determine variable weights by calculating their influence on game scores. Additionally, S-W and K-S tests are performed on these indicators to determine if game swings and successes are random. Third, building on the first two steps, logistic regression is used to identify critical thresholds in the performance function. This helps pinpoint specific moments of situation shifts, which, combined with player momentum changes, determine the dominant side. Finally, the constructed model undergoes comprehensive analysis, validation, and evaluation.
+2.4 Research SignificanceBy establishing relevant models, this paper investigates the mechanisms behind phenomena in tennis matches, such as unexpected comebacks despite significant disadvantages. We identify and quantify momentum as an indicator, analyzing key nodes of rhythm reversal. This understanding can help tennis players and coaches adjust their states and strategies in rapidly changing matches, leveraging momentum to overcome opponents even when technical conditions are similar.
+3 Model hypothesis and symbol description3.1 Basic assumptions of the model
+A player’s performance level (skill) is assumed to be constant, unaffected by factors like fatigue, injury, off-field conditions, or natural elements. This provides a fundamental basis for data analysis.
+All on-field player data are considered accurate, true, and reflective of the actual game situation at that moment.
+Players are assumed to always exert maximum effort to win, with no influence from factors like physical strength conservation or betting.
+A player’s momentum is determined solely by their momentum at the previous moment and the change in momentum at the current moment. The opponent’s impact is expressed directly through this current momentum change and is not analyzed as an independent indicator.
+
+4 NotationsThe data are examined in each set, utilizing both absolute and relative evaluation indices.
+
+
+
+Symbols
+Descriptions &#x2F; Evaluation index
+
+
+
+X1
+p1-games
+
+
+X2
+Number of score leads in the current set
+
+
+X3
+serve-no
+
+
+X4
+p1-points-won
+
+
+X5
+server
+
+
+X6
+p1-winner
+
+
+X7
+Current set Number of points scored on non-touch forehand shots
+
+
+X8
+Current set Number of points scored on no touch backhand shots
+
+
+X9
+p1-double-fault
+
+
+X(10)
+p1-net-pt-won
+
+
+X(11)
+p1-net-pt
+
+
+X(12)
+They serve, they score
+
+
+X(13)
+p1-distance-run
+
+
+X(14)
+p1-unf-err
+
+
+X(15)
+Whether the current point is ahead of the opponent
+
+
+$\beta$
+The weight of the momentum function indicator
+
+
+$q$
+The influence of an indicator on the score
+
+
+$\alpha$
+The weight effect of the momentum of the previous moment on the momentum of this moment
+
+
+$M_t$
+The amount of change in momentum at the current moment
+
+
+$I_t$
+Momentum function
+
+
+5 Task 1 Model Establishment and Solution5.1 Problem AnalysisProblem 1 requires developing a model to measure and evaluate a player’s performance against an opponent based on in-game actions and results. The player’s game flow should then be visualized.
+Using the provided data (‘data_dictionary.csv’, ‘Wimbledon_featured_matches.csv’), we plan to select variables that reflect player performance, define an objective function, and employ machine learning for model development. The model’s effectiveness will then be tested and evaluated.
+5.2 Model Establishment5.2.1 Data preprocessingAfter determining independent and dependent variables, we preprocess the existing data. This involves identifying and transforming anomalous data, such as null values (“NA”) and string representations of numerical values, to ensure data quality and model accuracy. Subsequently, the variable data is extracted, and the resulting dataset is standardized.
+5.2.2 Model PreparationIndependent variables from $X_1$ to $X_{15}$ are selected. The dependent variable is a binary label: $1$ represents a score, and $0$ represents no score. To achieve optimal performance, classification models are employed for fitting and training. Commonly used classification models include LGBM, SVC, MLP, Logistic Regression, and XGBoost. We specifically selected Decision Trees, Random Forest, KNN, BPNN, SVC, and XGBoost. The data was partitioned, with $6176$ records for training and $1108$ for prediction. The results are summarized below:
+Table 1: Performance Comparison of Different Models
+
+
+
+Model
+Dataset
+Accuracy
+Recall
+Precision
+F1 Score
+
+
+
+Decision Trees
+Training Set
+0.834
+0.834
+0.835
+0.834
+
+
+
+Test Set
+0.756
+0.756
+0.758
+0.756
+
+
+Random Forest
+Training Set
+0.83
+0.83
+0.83
+0.829
+
+
+
+Test Set
+0.765
+0.765
+0.766
+0.765
+
+
+KNN
+Training Set
+0.848
+0.848
+0.848
+0.848
+
+
+
+Test Set
+0.745
+0.745
+0.745
+0.745
+
+
+BPNN
+Training Set
+0.8
+0.8
+0.805
+0.799
+
+
+
+Test Set
+0.757
+0.757
+0.762
+0.757
+
+
+SVC
+Training Set
+0.653
+0.653
+0.794
+0.603
+
+
+
+Test Set
+0.631
+0.631
+0.785
+0.565
+
+
+XGBoost
+Training Set
+0.925
+0.925
+0.925
+0.925
+
+
+
+Test Set
+0.767
+0.767
+0.769
+0.766
+
+
+5.2.3 Model TestBased on Section 2.2, we generated the ROC curve for the XGBoost model. The ROC curve, which plots sensitivity against specificity, serves as a comprehensive metric for continuous variables; a larger Area Under the Curve (AUC) signifies higher diagnostic accuracy. The point on the ROC curve closest to the upper-left corner indicates the optimal critical value for achieving both high sensitivity and specificity.
+The evaluation criteria for AUC values in model performance are:
+
+$AUC &#x3D; 1$: A perfect classifier, implying at least one threshold yields perfect prediction. Such classifiers are rare in practice.
+$0.5 &lt; AUC &lt; 1$: Better than a random guess. The classifier has predictive value if the threshold is set appropriately.
+$AUC &#x3D; 0.5$: Equivalent to random guessing (e.g., a coin toss), indicating no predictive value.
+$AUC &lt; 0.5$: Worse than random guessing. However, if predictions are consistently inverse, it can still be leveraged to perform better than random.
+
+The AUC of $0.97$ demonstrates a strong classification prediction effect. When tested with the final $1108$ data points from the standardized dataset, the XGBoost model maintained high prediction accuracy, consistently around $76%$. The ROC curve further validates the model’s classification prediction capability.
+Table 2: XGBoost Model Performance
+
+
+
+Dataset
+Accuracy
+Recall
+Precision
+F1 Score
+
+
+
+Training Set
+0.925
+0.925
+0.925
+0.925
+
+
+Test Set
+0.767
+0.767
+0.769
+0.766
+
+
+5.2.4 Display of Model Prediction EffectFollowing model testing, we confirmed the XGBoost model’s reliability for this competition and proceeded to visualize player data from two matches. To account for varying time intervals between points and to achieve a smoother representation of player performance, we used cubic spline interpolation to interpolate the output and normalize the final results. Additionally, player service status (independent variable $X_5$, where $0$ means no and $1$ means yes) was integrated into the model. The figures display both uninterpolated (light lines) and interpolated (dark lines) predicted values, with Player 1 as the main observation focus.
+6 Task 2 Model Establishment and Solution6.1 Solution to Problem 2Given the coach’s skepticism regarding “momentum,” we quantify this indicator and analyze its correlation with the performance function predicted in Problem 1 through visual data. By calculating the correlation between “momentum” and the final game outcome on the test set, we aim to demonstrate a significant relationship, thereby refuting the coach’s view.
+6.2 Problem 2 Model Establishment and SolutionTo precisely quantify “momentum,” we define it as a function of previous momentum and the current momentum change, which in turn is derived from specific variables. We identify indicators likely to influence player mentality and morale. The momentum function can be expressed as:
+$$ M_t &#x3D; \sum_{i&#x3D;1}^m \beta_i q_i x_i $$where $X \in {X_{7}, X_{8}, X_{9}, X_{10}, X_{15}, X_{16}}$.
+Here, $\beta$ represents the weight of each indicator in momentum, and $q$ signifies the impact of changes in that variable on the game. The entropy weight method is used to determine $\beta$ and $q$. This involves analyzing overall game data, identifying score changes within specific game sections, and counting indicator occurrences to calculate $q$.
+6.2.1 Entropy weight methodThe entropy weight method, a multi-attribute decision analysis technique, determines attribute influence weights on the final result based on information entropy. It calculates the importance of each attribute by assessing its entropy.
+The principle of the entropy weight method is as follows: Information entropy measures an indicator’s dispersion. Greater dispersion leads to a smaller information entropy value and a larger influence (weight) on the comprehensive evaluation. Conversely, if an indicator’s values are uniform, it holds no role in the comprehensive evaluation. Therefore, information entropy provides an objective basis for calculating index weights in multi-indicator evaluations.
+This method determines weights directly from the data, ensuring strong objectivity and minimizing subjective influence on decision results. Its calculation logic is simple and clear, making it effective and easy to implement.
+For analysis, we selected six indicators: $X_7$ (points scored on non-touch forehand shots in the current set), $X_8$ (points scored on non-touch backhand shots in the current set), $X_9$ (whether the second serve is a double fault), $X_{10}$ (net points won), $X_{15}$ (unforced errors), and $X_{16}$ (whether the current point is ahead of the opponent). We believe these indicators, encompassing both positive and negative influences, significantly impact momentum.
+The specific calculation steps are: First, we construct the index system and determine the index matrix, where each column is an indicator and each row represents an individual’s value across different indicators. With six indicators and six individuals, the matrix is then standardized—a step already completed during data preprocessing. Finally, the entropy ($H_j$) for each index is calculated using the following formulas:
+$$ P_{ij} &#x3D; \frac{Z_{ij}}{\sum_{i&#x3D;1}^m Z_{ij}} $$$$ H_j &#x3D; -\frac{\sum_{i&#x3D;1}^m P_{ij} \ln(P_{ij})}{\ln m} $$
+Finally, the entropy weight ($w_j$) is calculated using the entropy value: $w_j &#x3D; \frac{1-H_j}{n-\sum_{j&#x3D;1}^n H_j}$. The final values obtained for each weight are $26.274, 33.962, 0.176, 26.896, 1.406, 11.287$. These results are then substituted into the momentum function expression.
+6.2.2 Calculate the impact of each indicator on the match during the matchThis step aims to determine $q$. The primary operation involves selecting a dataset and calculating the average impact of score changes compared to the operation of that step. For example, if a score changes by $5$ points and occurs $5$ times, the corresponding $q$ value is calculated as the average value: $579&#x2F;577 &#x3D; 1$, $273&#x2F;273 &#x3D; 1$, $-122&#x2F;122 &#x3D; 1$, $545&#x2F;545 &#x3D; 1$, $-920&#x2F;920 &#x3D; -1$, $-152&#x2F;2462 &#x3D; -0.0617$. Based on $\beta$ and $q$, the current momentum change ($M_t$) can be calculated.
+6.3 Find the final momentum functionThe model is defined as:$$ \text{Model} :&#x3D; \alpha + I_t I_{(t-1)} M_t $$Here, $\alpha$ represents the correlation between the momentum of the previous time period and the momentum of the later time period. Each score moment is treated as a unit, and momentum changes approximate the relationship between momentum functions. The result of the above expression is approximately $0.1$, suggesting $\alpha \approx 0.1$. Substituting this value allows derivation of the momentum function.
+The visualization demonstrates a clear positive correlation between the momentum function and the performance function during certain stages of representation.
+6.4 Result analysis of question 2A Pearson correlation test was conducted between the momentum function and the predicted performance value from Problem 1 to assess momentum’s influence on the game.
+Table 3: Correlation Analysis between Performance and Momentum
+
+
+
+
+Performance
+Momentum
+
+
+
+Performance
+1 ($0.000^{***}$)
+($0.000 \times 0.336^{**}$)
+
+
+Momentum
+($0.000 \times 0.336^{**}$)
+1 ($0.000^{***}$)
+
+
+The Pearson correlation coefficient is $0.335$, indicating a weak correlation between the momentum function and the original performance function. This suggests that while momentum has a certain influence on the game result, it is not random, contrary to the coach’s assertion.
+6.4.1 Normalty TestTo further validate that “momentum” influences game outcomes and to refute the coach’s skepticism, we performed normality tests.
+Given that the momentum function is composed of selected indicators, its random distribution can be approximated as normal.
+Normality testing, primarily conducted using the S-W and K-S tests, assesses whether selected independent variables conform to a normal distribution by analyzing their statistical significance. If the significance ($p &lt; 0.05$), the variable does not meet the normal distribution assumption.
+Taking $X_7$ as an example, with a sample size $N \ge 5000$, the K-S test yielded a significance $p$-value of $0.000^{***}$. This significant result rejects the null hypothesis, indicating that the data for $X_7$ does not follow a normal distribution. Further analysis confirms this, as its kurtosis ($7.673$) is less than $10$ and its skewness ($3.11$) is greater than $3$, consistent with deviations from normality.
+Since other indicators also failed the normality test, this collective evidence refutes the coach’s assertion that “momentum” is random, strongly suggesting that “momentum” indeed impacts the game.
+7 Task 3 Model Establishment and Solution7.1 Solution to Problem 3Building on the conclusions from the first two problems, Problem 3 approaches game dynamics from two angles. First, by using the performance function from Problem 1, we identify specific moments of situation change, reflecting the actual competition. Second, from the perspective of momentum, a positive increase in the momentum change of the two players indicates an advantage for Player 1 during that period, and vice versa. Thus, the model can effectively identify these shifts in the game’s flow.
+7.2 Modeling and solution of problem 3To address this problem, we develop the model using two distinct approaches: first, predicting situation changes through logical analysis; second, analyzing game fluctuations by combining performance and momentum functions from the first two problems to assess game flow.
+7.2.1 Logistic regressionLogistic regression, a generalized linear regression model, differs from linear regression mainly in its dependent variable type; it is suited for binomial distributions, making it primarily a classification method for two-category problems. The process involves establishing a cost function for regression or classification, iteratively solving for optimal model parameters, and then validating the model’s quality. Logistic regression excels at fitting certain linear relationships, offers fast computation, strong noise immunity, and robustness against outliers.
+For our normalized data, we apply logistic regression to determine the median of the performance function. Values above this median indicate Player 1’s advantage, and vice versa. Variables $X_1$ to $X_{14}$ are used as logistic regression inputs, with the momentum increment at each time point as the dependent variable. If this increment is greater than $0$ (occurring in approximately $47%$ of instances), Player 1 holds the advantage. $80%$ of the data is used for training.
+Table 5: Logistic Regression Model Performance on Training and Test Sets
+
+
+
+Dataset
+Accuracy Rate
+Recall Rate
+Precision Rate
+F1 Score
+
+
+
+Training Set
+0.746
+0.746
+0.743
+0.739
+
+
+Test Set
+0.708
+0.708
+0.785
+0.679
+
+
+To verify the model’s accuracy, we also employed KNN classification and BP neural networks, which yielded the following respective conclusions:
+Table 6: KNN Model Performance on Training and Test Sets
+
+
+
+Dataset
+Accuracy Rate
+Recall Rate
+Precision Rate
+F1 Score
+
+
+
+Training Set
+0.877
+0.877
+0.876
+0.876
+
+
+Test Set
+0.694
+0.694
+0.706
+0.685
+
+
+Table 7: BP-NN Model Performance on Training and Test Sets
+
+
+
+Dataset
+Accuracy Rate
+Recall Rate
+Precision Rate
+F1 Score
+
+
+
+Training Set
+0.746
+0.746
+0.743
+0.740
+
+
+Test Set
+0.708
+0.708
+0.785
+0.679
+
+
+Logistic regression demonstrates strong performance in both accuracy and precision, aiding in more accurate judgments of the game situation.
+7.2.2 Identify the most relevant factorsThe game is analyzed using performance and momentum functions as key factors for correlation assessment. Model analysis results are statistically significant ($p &lt; 0.05$), indicating the model meets requirements. Additionally, VIF indices below $10$ confirm no multicollinearity issues, ensuring a well-constructed model. The game can be approximated by the equation:$$ y &#x3D; 0.09 + 0.708 \times \text{PredictedValue} + 0.41 \times \text{Momentum} $$Ranking indicators by relevance, $X_5$ (server) and $X_{10}$ (net points won) emerge as the most significant factors. This analysis suggests that serving is the highest influencing factor, followed by scoring.
+7.3 Suggestions to the playerConsidering indicators highly correlated with momentum ($X_{10}$, $X_5$, and $X_8$), we offer the following suggestions:
+
+Strengthen serving training in daily life to maximize its advantage in initiating points and building momentum.
+Increase net approaches during play; scoring at the net is instrumental in improving “momentum.”
+Focus on hitting more winning points. If the opponent scores consecutive winning points, a timely pause (e.g., medical timeout, coaching break) should be utilized to disrupt their rhythm.
+
+8 Task 4 Model Analysis8.1 Model TestingFor model testing, we use the Problem 1 model. The independent variable data from Carlos Alcaraz’s match against Daniil Medvedev (2023-wimbledon-1601) serves as the test set, while other datasets are used for training, with Player 1 remaining the primary observation.
+The prediction effect is evaluated as follows:
+Table 8: Performance Metrics on Test Set
+
+
+
+Dataset
+Accuracy
+Recall
+Precision
+F1
+
+
+
+Test set
+0.962
+0.978
+0.957
+0.966
+
+
+A visual comparison between actual and predicted values shows a high prediction accuracy. The horizontal axis represents the natural series, and the vertical axis indicates whether a score was achieved (1 for score, 0 otherwise).
+The prediction effect shows improvement compared to the results from the 5.1 model test.
+The key difference between this test and Section 2.3 is that this test specifically trains the model on data from a single player (Carlos Alcaraz), whereas Section 2.3 used a mixed dataset of all players. This highlights that individual player characteristics significantly influence the model’s prediction accuracy.
+8.2 Factors that may affect the prediction accuracy of the modelIndividual player factors significantly impact prediction accuracy: models trained on single-player data achieve higher accuracy than those trained on mixed datasets. This suggests that the chosen independent variables are linked to individual player abilities, thus limiting the model’s generalizability.
+8.3 Discussion on the degree of model generalityBased on the selected independent variables, the model’s generality is discussed from the following perspectives:
+
+Competition Rules: Variables such as $X_1$ and $X_9$ are meaningful within tennis rules; their applicability may not extend to other sports.
+Game Characteristics: Variables like $X_{10}$ and $X_{11}$ pertain to unique tennis characteristics, such as net play. These may not translate to sports like table tennis, where players rarely approach the net in the same manner.
+Individual Player Characteristics: The high accuracy of player-specific models suggests that personal factors—including serving habits, gender, physical strength, and hitting power—are crucial for prediction accuracy, thereby limiting the model’s universal applicability.
+
+9 Strength, Weakness and Further DiscussionOur model offers insights into player performance prediction based on their actions, demonstrating several strengths that provide inspiration for future research:
+
+The model training and prediction speeds are very fast, allowing for rapid modeling with simple data processing.
+The model integrates multiple features, enabling a comprehensive analysis of player “momentum” changes from various perspectives.
+The model’s visualization is intuitive, and its parameters can be easily adjusted.
+
+However, upon reflection, we identify several areas where the model could be improved:
+
+In terms of independent variable selection, incorporating more representative and universal variables could enhance the model’s versatility, although this might slightly reduce accuracy in specific contexts.
+Collecting more extensive training data, beyond just what was provided for this event, could improve robustness.
+Incorporating factors beyond player actions, such as weather conditions, crowd cheers, venue specifics, and historical player records, could provide a more holistic understanding.
+
+
+MemoTo: Darren Cahill and other great tennis coachesFrom the team: 2430080Date: February 6, 2024Subject: Analysis of Article and Strategies for Further Research
+In today’s tennis, optimizing players’ game conditioning is as crucial as technical and physical improvements to enable timely wins or judicious energy management. This article quantifies “momentum” and highlights its importance, providing strategies for your reference.
+By analyzing Wimbledon Grand Slam match data, including scores, serves, points, and errors, our team developed a process and metrics to predict and analyze player form over time. This helps identify metrics with the greatest impact on “momentum” and form. We will detail this analysis and provide specific recommendations.
+Our methodology:Our methodology primarily employs a machine learning model focused on XGBoost for data processing.
+
+Using the XGBoost model, we generate a Receiver Operating Characteristic (ROC) curve. This curve reflects the sensitivity and specificity of continuous variables, with a larger Area Under the Curve (AUC) indicating higher diagnostic accuracy. The point on the ROC curve closest to the upper-left corner represents the optimal balance of sensitivity and specificity.
+We standardize and normalize key indicators—including serve, score, error, and net play—for consistent comparison and processing. Subsequently, using logistic regression, we predict game fluctuations at specific moments, offering insights into dynamic shifts.
+
+Findings and Recommendations of the Study:
+During a match, if the opponent consistently scores, wins more points, or scores more at the net—indicators strongly correlated with “momentum”—a timely pause (e.g., a medical timeout or coaching break) should be proposed to disrupt their offensive rhythm.
+Game tactics should be adapted to opponent characteristics. Against opponents with strong explosive power and fierce offense, strategically avoid their strengths, conserve energy, and capitalize when their “momentum” shows signs of declining. If facing an opponent with low momentum early in the match, aim to score consecutive points to keep their momentum suppressed and secure a swift victory.
+
+Our long-term recommendations are as follows:
+For normal training, prioritize improving serve quality and scoring rate. The model indicates serve has a significant impact on player “momentum” and scoring, warranting frequent practice.
+Implement player pressure training and psychological counseling to prevent substantial momentum declines caused by economic-level drops. Concurrently, analyze the player’s optimal “in-the-zone” period and devise strategies to extend or appropriately modify it.
+
+We thank you for your time and consideration, and hope that you will adopt our suggestions so that more players can realize their talents and become stronger.
+Sincerely,Team 2430080Your friends
+]]></content>
+      <tags>
+        <tag>数学建模</tag>
+        <tag>机器学习</tag>
+        <tag>竞赛</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【数据结构】第一章-基本概念</title>
     <url>/2025/03/25/1556/</url>
     <content><![CDATA[数据结构基础概念一、基本概念
@@ -659,497 +1150,6 @@ H、关系
       </tags>
   </entry>
   <entry>
-    <title>2024年美赛</title>
-    <url>/2024/02/07/2150/</url>
-    <content><![CDATA[2024年5月更新
-最后是Honorable Winner.
-
-以下是原文：
-
-回家后就没怎么学，四天时间三个人随便做了做，本来已经打算开摆了，编程建模写论文都粘点。  好歹是场比赛，这几日一直为之心力憔悴，开个贴记录一下。下面是论文部分内容。
-
-Too close to call? The Impact of Momentum Changes in Tennis
-Problem Chosen: C
-2024 MCM&#x2F;ICM Summary Sheet
-Team Control Number: 2430080
-
-SummaryIn an intense tennis match, even a world-renowned and experienced veteran may fail to grasp a momentary reversal and lose. Therefore, identifying factors affecting match points and situation changes, and verifying the potential impact of momentum, is crucial for athletes to better manage matches and refine their strategies. This paper addresses this by constructing models to quantify player performance and momentum, and to analyze how various factors influence game situations.
-Before modeling, we preprocess the annexed Wimbledon match data, identifying and normalizing relevant factors for subsequent quantification.
-For Problem 1, as an initial step, we identify performance-related factors, build a corresponding model, and visualize athlete performance throughout the game. We test several classification models, selecting the best one based on accuracy, recall, precision, and other metrics, followed by performance visualization.
-Problem 2 primarily quantifies “momentum,” transforming it from a theoretical concept into a practical index. We compare this index with previous game results to determine if “momentum” is random. The entropy weight method is used to determine the weight of each variable affecting momentum, followed by Spearman correlation analysis to assess momentum’s influence on the game. Additionally, S-W and K-S tests are performed on the index to determine if game swings and successes are random. The fact that selected variables do not satisfy random distribution further supports a non-random, albeit weak ($0.334$ correlation), influence of “momentum” on game outcomes, refuting the coach’s skepticism.
-For Problem 3, the focus is on modeling game fluctuation. Building on the previous two problems, logistic regression is used to identify performance function conversion points, pinpointing key moments of situation change. The KNN method and BP neural network provide supporting evidence. The model’s effectiveness is cross-verified using multi-set match data. The most relevant factors are determined using combined metrics from the first two problems, and a correlation heatmap is presented. Recommendations derived from these metrics aim to provide insights into player momentum changes in different match situations and support future strategic planning.
-For Problem 4, the logistic regression model generally predicts game fluctuation well. We explore the model’s generalization and limitations from a variable selection perspective, considering metrics overlooked in other models, and propose potential improvements. For instance, enhancing generalization could make the model effective across different competitive sports, aiding athletes’ long-term preparation and physical health.
-Keywords: Machine Learning, Momentum, Correlation Analysis, Entropy Weighting Method, Logistic Regression
-
-1 Introduction1.1 BackgroundTennis, a sport demanding endurance, speed, and comprehensive athletic ability, has a rich history. Elite players like Roger Federer and Rafael Nadal combine quick reflexes and explosive power with stamina and stability. Explosiveness and quick reflexes ensure optimal positioning and decision-making for every shot. Endurance and muscle stability enable sustained high-intensity play while reducing injury risk. As a new generation of high-level players emerges and older champions age, there’s growing interest in whether “momentum” influences game trends, potentially mitigating physical decline or enabling tactical development to defeat opponents. Our team addresses this by processing known data, characterizing and correlating indicators, applying principal component analysis where suitable, and using machine learning to build models and draw conclusions. We use data from the initial games of the provided dataset, focusing on indicators such as serve, receive, score, and unforced errors.
-1.2 Restatement of the ProblemCurrently, the existence, quantification, and impact of an abstract indicator like “momentum” remain unclear, particularly how various game events create or change it. This article aims to optimize understanding by addressing the following problems:
-
-Analyze the game’s flow to determine when and to what extent a player performs better, establish evaluation criteria, and plot the player’s score curve.
-Assess whether the model obtained is random or demonstrates a significant relationship with “momentum,” thereby addressing coach skepticism.
-Identify moments when game momentum shifts between players and provide advice based on these insights.
-Evaluate the model’s applicability and limitations.
-
-2 Overview of basic definitions2.1 Rules of TennisTennis rules are complex, especially Grand Slam men’s singles scoring. A match is best-of-five sets. A set typically involves winning 6 games, but requires a two-game lead (e.g., 7-5 or tie-break at 6-6). In a game, a player needs four points to win, also with a two-point lead. Point scores are:
-
-0 points &#x3D; love
-1 point &#x3D; 15
-2 points &#x3D; 30
-3 points &#x3D; 40
-
-At $40-40$ (“Deuce”), a player must win two consecutive points to secure the game. Winning the first point gives “AD-in,” and winning the next wins the game. Losing the point returns the score to $40-40$.
-Serve is critical and requires separate analysis. Players alternate serving each game, with two service attempts per point. Failing to land the ball in the service area on both attempts results in a “double fault,” costing the server the point.
-2.2 the “Momentum” theoryThe “momentum” theory posits that in sports, gaining an advantage often leads to sustained success. This momentum can boost an athlete’s or team’s confidence and may also affect the opponent’s mental state.
-In tennis, an athlete who gains an advantage often maintains it, exerting psychological pressure on the opponent. This psychological edge can simultaneously motivate the advantaged player, leading to positive outcomes.
-Beyond psychological factors like self-confidence and opponent pressure, “momentum” can also be generated through strategic game management, such such as physical energy conservation or adapting to an opponent’s playing style.
-2.3 Model OverviewThe overall architecture of our model involves a three-fold task: constructing a model to quantify player performance at any given moment; modeling momentum and investigating its role in game swings and success; and applying the proposed model to a given match to test its performance.
-Our methodology proceeds as follows: First, we preprocess the dataset and select&#x2F;construct $14$ variables for modeling. Among several methods, the XGBoost classification model was chosen for its superior predictive performance. The trained model predicts whether a player will perform well or poorly at a given moment based on these $14$ variables. Second, to analyze momentum’s potential impact on game trends, we select six key variables to construct the momentum function. We use the entropy weighting method to determine variable weights by calculating their influence on game scores. Additionally, S-W and K-S tests are performed on these indicators to determine if game swings and successes are random. Third, building on the first two steps, logistic regression is used to identify critical thresholds in the performance function. This helps pinpoint specific moments of situation shifts, which, combined with player momentum changes, determine the dominant side. Finally, the constructed model undergoes comprehensive analysis, validation, and evaluation.
-2.4 Research SignificanceBy establishing relevant models, this paper investigates the mechanisms behind phenomena in tennis matches, such as unexpected comebacks despite significant disadvantages. We identify and quantify momentum as an indicator, analyzing key nodes of rhythm reversal. This understanding can help tennis players and coaches adjust their states and strategies in rapidly changing matches, leveraging momentum to overcome opponents even when technical conditions are similar.
-3 Model hypothesis and symbol description3.1 Basic assumptions of the model
-A player’s performance level (skill) is assumed to be constant, unaffected by factors like fatigue, injury, off-field conditions, or natural elements. This provides a fundamental basis for data analysis.
-All on-field player data are considered accurate, true, and reflective of the actual game situation at that moment.
-Players are assumed to always exert maximum effort to win, with no influence from factors like physical strength conservation or betting.
-A player’s momentum is determined solely by their momentum at the previous moment and the change in momentum at the current moment. The opponent’s impact is expressed directly through this current momentum change and is not analyzed as an independent indicator.
-
-4 NotationsThe data are examined in each set, utilizing both absolute and relative evaluation indices.
-
-
-
-Symbols
-Descriptions &#x2F; Evaluation index
-
-
-
-X1
-p1-games
-
-
-X2
-Number of score leads in the current set
-
-
-X3
-serve-no
-
-
-X4
-p1-points-won
-
-
-X5
-server
-
-
-X6
-p1-winner
-
-
-X7
-Current set Number of points scored on non-touch forehand shots
-
-
-X8
-Current set Number of points scored on no touch backhand shots
-
-
-X9
-p1-double-fault
-
-
-X(10)
-p1-net-pt-won
-
-
-X(11)
-p1-net-pt
-
-
-X(12)
-They serve, they score
-
-
-X(13)
-p1-distance-run
-
-
-X(14)
-p1-unf-err
-
-
-X(15)
-Whether the current point is ahead of the opponent
-
-
-$\beta$
-The weight of the momentum function indicator
-
-
-$q$
-The influence of an indicator on the score
-
-
-$\alpha$
-The weight effect of the momentum of the previous moment on the momentum of this moment
-
-
-$M_t$
-The amount of change in momentum at the current moment
-
-
-$I_t$
-Momentum function
-
-
-5 Task 1 Model Establishment and Solution5.1 Problem AnalysisProblem 1 requires developing a model to measure and evaluate a player’s performance against an opponent based on in-game actions and results. The player’s game flow should then be visualized.
-Using the provided data (‘data_dictionary.csv’, ‘Wimbledon_featured_matches.csv’), we plan to select variables that reflect player performance, define an objective function, and employ machine learning for model development. The model’s effectiveness will then be tested and evaluated.
-5.2 Model Establishment5.2.1 Data preprocessingAfter determining independent and dependent variables, we preprocess the existing data. This involves identifying and transforming anomalous data, such as null values (“NA”) and string representations of numerical values, to ensure data quality and model accuracy. Subsequently, the variable data is extracted, and the resulting dataset is standardized.
-5.2.2 Model PreparationIndependent variables from $X_1$ to $X_{15}$ are selected. The dependent variable is a binary label: $1$ represents a score, and $0$ represents no score. To achieve optimal performance, classification models are employed for fitting and training. Commonly used classification models include LGBM, SVC, MLP, Logistic Regression, and XGBoost. We specifically selected Decision Trees, Random Forest, KNN, BPNN, SVC, and XGBoost. The data was partitioned, with $6176$ records for training and $1108$ for prediction. The results are summarized below:
-Table 1: Performance Comparison of Different Models
-
-
-
-Model
-Dataset
-Accuracy
-Recall
-Precision
-F1 Score
-
-
-
-Decision Trees
-Training Set
-0.834
-0.834
-0.835
-0.834
-
-
-
-Test Set
-0.756
-0.756
-0.758
-0.756
-
-
-Random Forest
-Training Set
-0.83
-0.83
-0.83
-0.829
-
-
-
-Test Set
-0.765
-0.765
-0.766
-0.765
-
-
-KNN
-Training Set
-0.848
-0.848
-0.848
-0.848
-
-
-
-Test Set
-0.745
-0.745
-0.745
-0.745
-
-
-BPNN
-Training Set
-0.8
-0.8
-0.805
-0.799
-
-
-
-Test Set
-0.757
-0.757
-0.762
-0.757
-
-
-SVC
-Training Set
-0.653
-0.653
-0.794
-0.603
-
-
-
-Test Set
-0.631
-0.631
-0.785
-0.565
-
-
-XGBoost
-Training Set
-0.925
-0.925
-0.925
-0.925
-
-
-
-Test Set
-0.767
-0.767
-0.769
-0.766
-
-
-5.2.3 Model TestBased on Section 2.2, we generated the ROC curve for the XGBoost model. The ROC curve, which plots sensitivity against specificity, serves as a comprehensive metric for continuous variables; a larger Area Under the Curve (AUC) signifies higher diagnostic accuracy. The point on the ROC curve closest to the upper-left corner indicates the optimal critical value for achieving both high sensitivity and specificity.
-The evaluation criteria for AUC values in model performance are:
-
-$AUC &#x3D; 1$: A perfect classifier, implying at least one threshold yields perfect prediction. Such classifiers are rare in practice.
-$0.5 &lt; AUC &lt; 1$: Better than a random guess. The classifier has predictive value if the threshold is set appropriately.
-$AUC &#x3D; 0.5$: Equivalent to random guessing (e.g., a coin toss), indicating no predictive value.
-$AUC &lt; 0.5$: Worse than random guessing. However, if predictions are consistently inverse, it can still be leveraged to perform better than random.
-
-The AUC of $0.97$ demonstrates a strong classification prediction effect. When tested with the final $1108$ data points from the standardized dataset, the XGBoost model maintained high prediction accuracy, consistently around $76%$. The ROC curve further validates the model’s classification prediction capability.
-Table 2: XGBoost Model Performance
-
-
-
-Dataset
-Accuracy
-Recall
-Precision
-F1 Score
-
-
-
-Training Set
-0.925
-0.925
-0.925
-0.925
-
-
-Test Set
-0.767
-0.767
-0.769
-0.766
-
-
-5.2.4 Display of Model Prediction EffectFollowing model testing, we confirmed the XGBoost model’s reliability for this competition and proceeded to visualize player data from two matches. To account for varying time intervals between points and to achieve a smoother representation of player performance, we used cubic spline interpolation to interpolate the output and normalize the final results. Additionally, player service status (independent variable $X_5$, where $0$ means no and $1$ means yes) was integrated into the model. The figures display both uninterpolated (light lines) and interpolated (dark lines) predicted values, with Player 1 as the main observation focus.
-6 Task 2 Model Establishment and Solution6.1 Solution to Problem 2Given the coach’s skepticism regarding “momentum,” we quantify this indicator and analyze its correlation with the performance function predicted in Problem 1 through visual data. By calculating the correlation between “momentum” and the final game outcome on the test set, we aim to demonstrate a significant relationship, thereby refuting the coach’s view.
-6.2 Problem 2 Model Establishment and SolutionTo precisely quantify “momentum,” we define it as a function of previous momentum and the current momentum change, which in turn is derived from specific variables. We identify indicators likely to influence player mentality and morale. The momentum function can be expressed as:
-$$ M_t &#x3D; \sum_{i&#x3D;1}^m \beta_i q_i x_i $$where $X \in {X_{7}, X_{8}, X_{9}, X_{10}, X_{15}, X_{16}}$.
-Here, $\beta$ represents the weight of each indicator in momentum, and $q$ signifies the impact of changes in that variable on the game. The entropy weight method is used to determine $\beta$ and $q$. This involves analyzing overall game data, identifying score changes within specific game sections, and counting indicator occurrences to calculate $q$.
-6.2.1 Entropy weight methodThe entropy weight method, a multi-attribute decision analysis technique, determines attribute influence weights on the final result based on information entropy. It calculates the importance of each attribute by assessing its entropy.
-The principle of the entropy weight method is as follows: Information entropy measures an indicator’s dispersion. Greater dispersion leads to a smaller information entropy value and a larger influence (weight) on the comprehensive evaluation. Conversely, if an indicator’s values are uniform, it holds no role in the comprehensive evaluation. Therefore, information entropy provides an objective basis for calculating index weights in multi-indicator evaluations.
-This method determines weights directly from the data, ensuring strong objectivity and minimizing subjective influence on decision results. Its calculation logic is simple and clear, making it effective and easy to implement.
-For analysis, we selected six indicators: $X_7$ (points scored on non-touch forehand shots in the current set), $X_8$ (points scored on non-touch backhand shots in the current set), $X_9$ (whether the second serve is a double fault), $X_{10}$ (net points won), $X_{15}$ (unforced errors), and $X_{16}$ (whether the current point is ahead of the opponent). We believe these indicators, encompassing both positive and negative influences, significantly impact momentum.
-The specific calculation steps are: First, we construct the index system and determine the index matrix, where each column is an indicator and each row represents an individual’s value across different indicators. With six indicators and six individuals, the matrix is then standardized—a step already completed during data preprocessing. Finally, the entropy ($H_j$) for each index is calculated using the following formulas:
-$$ P_{ij} &#x3D; \frac{Z_{ij}}{\sum_{i&#x3D;1}^m Z_{ij}} $$$$ H_j &#x3D; -\frac{\sum_{i&#x3D;1}^m P_{ij} \ln(P_{ij})}{\ln m} $$
-Finally, the entropy weight ($w_j$) is calculated using the entropy value: $w_j &#x3D; \frac{1-H_j}{n-\sum_{j&#x3D;1}^n H_j}$. The final values obtained for each weight are $26.274, 33.962, 0.176, 26.896, 1.406, 11.287$. These results are then substituted into the momentum function expression.
-6.2.2 Calculate the impact of each indicator on the match during the matchThis step aims to determine $q$. The primary operation involves selecting a dataset and calculating the average impact of score changes compared to the operation of that step. For example, if a score changes by $5$ points and occurs $5$ times, the corresponding $q$ value is calculated as the average value: $579&#x2F;577 &#x3D; 1$, $273&#x2F;273 &#x3D; 1$, $-122&#x2F;122 &#x3D; 1$, $545&#x2F;545 &#x3D; 1$, $-920&#x2F;920 &#x3D; -1$, $-152&#x2F;2462 &#x3D; -0.0617$. Based on $\beta$ and $q$, the current momentum change ($M_t$) can be calculated.
-6.3 Find the final momentum functionThe model is defined as:$$ \text{Model} :&#x3D; \alpha + I_t I_{(t-1)} M_t $$Here, $\alpha$ represents the correlation between the momentum of the previous time period and the momentum of the later time period. Each score moment is treated as a unit, and momentum changes approximate the relationship between momentum functions. The result of the above expression is approximately $0.1$, suggesting $\alpha \approx 0.1$. Substituting this value allows derivation of the momentum function.
-The visualization demonstrates a clear positive correlation between the momentum function and the performance function during certain stages of representation.
-6.4 Result analysis of question 2A Pearson correlation test was conducted between the momentum function and the predicted performance value from Problem 1 to assess momentum’s influence on the game.
-Table 3: Correlation Analysis between Performance and Momentum
-
-
-
-
-Performance
-Momentum
-
-
-
-Performance
-1 ($0.000^{***}$)
-($0.000 \times 0.336^{**}$)
-
-
-Momentum
-($0.000 \times 0.336^{**}$)
-1 ($0.000^{***}$)
-
-
-The Pearson correlation coefficient is $0.335$, indicating a weak correlation between the momentum function and the original performance function. This suggests that while momentum has a certain influence on the game result, it is not random, contrary to the coach’s assertion.
-6.4.1 Normalty TestTo further validate that “momentum” influences game outcomes and to refute the coach’s skepticism, we performed normality tests.
-Given that the momentum function is composed of selected indicators, its random distribution can be approximated as normal.
-Normality testing, primarily conducted using the S-W and K-S tests, assesses whether selected independent variables conform to a normal distribution by analyzing their statistical significance. If the significance ($p &lt; 0.05$), the variable does not meet the normal distribution assumption.
-Taking $X_7$ as an example, with a sample size $N \ge 5000$, the K-S test yielded a significance $p$-value of $0.000^{***}$. This significant result rejects the null hypothesis, indicating that the data for $X_7$ does not follow a normal distribution. Further analysis confirms this, as its kurtosis ($7.673$) is less than $10$ and its skewness ($3.11$) is greater than $3$, consistent with deviations from normality.
-Since other indicators also failed the normality test, this collective evidence refutes the coach’s assertion that “momentum” is random, strongly suggesting that “momentum” indeed impacts the game.
-7 Task 3 Model Establishment and Solution7.1 Solution to Problem 3Building on the conclusions from the first two problems, Problem 3 approaches game dynamics from two angles. First, by using the performance function from Problem 1, we identify specific moments of situation change, reflecting the actual competition. Second, from the perspective of momentum, a positive increase in the momentum change of the two players indicates an advantage for Player 1 during that period, and vice versa. Thus, the model can effectively identify these shifts in the game’s flow.
-7.2 Modeling and solution of problem 3To address this problem, we develop the model using two distinct approaches: first, predicting situation changes through logical analysis; second, analyzing game fluctuations by combining performance and momentum functions from the first two problems to assess game flow.
-7.2.1 Logistic regressionLogistic regression, a generalized linear regression model, differs from linear regression mainly in its dependent variable type; it is suited for binomial distributions, making it primarily a classification method for two-category problems. The process involves establishing a cost function for regression or classification, iteratively solving for optimal model parameters, and then validating the model’s quality. Logistic regression excels at fitting certain linear relationships, offers fast computation, strong noise immunity, and robustness against outliers.
-For our normalized data, we apply logistic regression to determine the median of the performance function. Values above this median indicate Player 1’s advantage, and vice versa. Variables $X_1$ to $X_{14}$ are used as logistic regression inputs, with the momentum increment at each time point as the dependent variable. If this increment is greater than $0$ (occurring in approximately $47%$ of instances), Player 1 holds the advantage. $80%$ of the data is used for training.
-Table 5: Logistic Regression Model Performance on Training and Test Sets
-
-
-
-Dataset
-Accuracy Rate
-Recall Rate
-Precision Rate
-F1 Score
-
-
-
-Training Set
-0.746
-0.746
-0.743
-0.739
-
-
-Test Set
-0.708
-0.708
-0.785
-0.679
-
-
-To verify the model’s accuracy, we also employed KNN classification and BP neural networks, which yielded the following respective conclusions:
-Table 6: KNN Model Performance on Training and Test Sets
-
-
-
-Dataset
-Accuracy Rate
-Recall Rate
-Precision Rate
-F1 Score
-
-
-
-Training Set
-0.877
-0.877
-0.876
-0.876
-
-
-Test Set
-0.694
-0.694
-0.706
-0.685
-
-
-Table 7: BP-NN Model Performance on Training and Test Sets
-
-
-
-Dataset
-Accuracy Rate
-Recall Rate
-Precision Rate
-F1 Score
-
-
-
-Training Set
-0.746
-0.746
-0.743
-0.740
-
-
-Test Set
-0.708
-0.708
-0.785
-0.679
-
-
-Logistic regression demonstrates strong performance in both accuracy and precision, aiding in more accurate judgments of the game situation.
-7.2.2 Identify the most relevant factorsThe game is analyzed using performance and momentum functions as key factors for correlation assessment. Model analysis results are statistically significant ($p &lt; 0.05$), indicating the model meets requirements. Additionally, VIF indices below $10$ confirm no multicollinearity issues, ensuring a well-constructed model. The game can be approximated by the equation:$$ y &#x3D; 0.09 + 0.708 \times \text{PredictedValue} + 0.41 \times \text{Momentum} $$Ranking indicators by relevance, $X_5$ (server) and $X_{10}$ (net points won) emerge as the most significant factors. This analysis suggests that serving is the highest influencing factor, followed by scoring.
-7.3 Suggestions to the playerConsidering indicators highly correlated with momentum ($X_{10}$, $X_5$, and $X_8$), we offer the following suggestions:
-
-Strengthen serving training in daily life to maximize its advantage in initiating points and building momentum.
-Increase net approaches during play; scoring at the net is instrumental in improving “momentum.”
-Focus on hitting more winning points. If the opponent scores consecutive winning points, a timely pause (e.g., medical timeout, coaching break) should be utilized to disrupt their rhythm.
-
-8 Task 4 Model Analysis8.1 Model TestingFor model testing, we use the Problem 1 model. The independent variable data from Carlos Alcaraz’s match against Daniil Medvedev (2023-wimbledon-1601) serves as the test set, while other datasets are used for training, with Player 1 remaining the primary observation.
-The prediction effect is evaluated as follows:
-Table 8: Performance Metrics on Test Set
-
-
-
-Dataset
-Accuracy
-Recall
-Precision
-F1
-
-
-
-Test set
-0.962
-0.978
-0.957
-0.966
-
-
-A visual comparison between actual and predicted values shows a high prediction accuracy. The horizontal axis represents the natural series, and the vertical axis indicates whether a score was achieved (1 for score, 0 otherwise).
-The prediction effect shows improvement compared to the results from the 5.1 model test.
-The key difference between this test and Section 2.3 is that this test specifically trains the model on data from a single player (Carlos Alcaraz), whereas Section 2.3 used a mixed dataset of all players. This highlights that individual player characteristics significantly influence the model’s prediction accuracy.
-8.2 Factors that may affect the prediction accuracy of the modelIndividual player factors significantly impact prediction accuracy: models trained on single-player data achieve higher accuracy than those trained on mixed datasets. This suggests that the chosen independent variables are linked to individual player abilities, thus limiting the model’s generalizability.
-8.3 Discussion on the degree of model generalityBased on the selected independent variables, the model’s generality is discussed from the following perspectives:
-
-Competition Rules: Variables such as $X_1$ and $X_9$ are meaningful within tennis rules; their applicability may not extend to other sports.
-Game Characteristics: Variables like $X_{10}$ and $X_{11}$ pertain to unique tennis characteristics, such as net play. These may not translate to sports like table tennis, where players rarely approach the net in the same manner.
-Individual Player Characteristics: The high accuracy of player-specific models suggests that personal factors—including serving habits, gender, physical strength, and hitting power—are crucial for prediction accuracy, thereby limiting the model’s universal applicability.
-
-9 Strength, Weakness and Further DiscussionOur model offers insights into player performance prediction based on their actions, demonstrating several strengths that provide inspiration for future research:
-
-The model training and prediction speeds are very fast, allowing for rapid modeling with simple data processing.
-The model integrates multiple features, enabling a comprehensive analysis of player “momentum” changes from various perspectives.
-The model’s visualization is intuitive, and its parameters can be easily adjusted.
-
-However, upon reflection, we identify several areas where the model could be improved:
-
-In terms of independent variable selection, incorporating more representative and universal variables could enhance the model’s versatility, although this might slightly reduce accuracy in specific contexts.
-Collecting more extensive training data, beyond just what was provided for this event, could improve robustness.
-Incorporating factors beyond player actions, such as weather conditions, crowd cheers, venue specifics, and historical player records, could provide a more holistic understanding.
-
-
-MemoTo: Darren Cahill and other great tennis coachesFrom the team: 2430080Date: February 6, 2024Subject: Analysis of Article and Strategies for Further Research
-In today’s tennis, optimizing players’ game conditioning is as crucial as technical and physical improvements to enable timely wins or judicious energy management. This article quantifies “momentum” and highlights its importance, providing strategies for your reference.
-By analyzing Wimbledon Grand Slam match data, including scores, serves, points, and errors, our team developed a process and metrics to predict and analyze player form over time. This helps identify metrics with the greatest impact on “momentum” and form. We will detail this analysis and provide specific recommendations.
-Our methodology:Our methodology primarily employs a machine learning model focused on XGBoost for data processing.
-
-Using the XGBoost model, we generate a Receiver Operating Characteristic (ROC) curve. This curve reflects the sensitivity and specificity of continuous variables, with a larger Area Under the Curve (AUC) indicating higher diagnostic accuracy. The point on the ROC curve closest to the upper-left corner represents the optimal balance of sensitivity and specificity.
-We standardize and normalize key indicators—including serve, score, error, and net play—for consistent comparison and processing. Subsequently, using logistic regression, we predict game fluctuations at specific moments, offering insights into dynamic shifts.
-
-Findings and Recommendations of the Study:
-During a match, if the opponent consistently scores, wins more points, or scores more at the net—indicators strongly correlated with “momentum”—a timely pause (e.g., a medical timeout or coaching break) should be proposed to disrupt their offensive rhythm.
-Game tactics should be adapted to opponent characteristics. Against opponents with strong explosive power and fierce offense, strategically avoid their strengths, conserve energy, and capitalize when their “momentum” shows signs of declining. If facing an opponent with low momentum early in the match, aim to score consecutive points to keep their momentum suppressed and secure a swift victory.
-
-Our long-term recommendations are as follows:
-For normal training, prioritize improving serve quality and scoring rate. The model indicates serve has a significant impact on player “momentum” and scoring, warranting frequent practice.
-Implement player pressure training and psychological counseling to prevent substantial momentum declines caused by economic-level drops. Concurrently, analyze the player’s optimal “in-the-zone” period and devise strategies to extend or appropriately modify it.
-
-We thank you for your time and consideration, and hope that you will adopt our suggestions so that more players can realize their talents and become stronger.
-Sincerely,Team 2430080Your friends
-]]></content>
-      <tags>
-        <tag>数学建模</tag>
-        <tag>机器学习</tag>
-        <tag>竞赛</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【数据结构】第二章-线性表</title>
     <url>/2025/03/25/1558/</url>
     <content><![CDATA[【数据结构】第二章-线性表线性表的定义线性表是具有相同数据类型的n（n≥0）个数据元素的有限序列，其中n为表长，当n&#x3D;0时线性表是一个空表。
@@ -1173,51 +1173,6 @@ GetElem(L,i): 按位查找操作。获取表L中第i个位置的元素的值。
         <tag>数据结构</tag>
         <tag>408</tag>
         <tag>线性表</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>关于宋庆龄</title>
-    <url>/2022/04/03/1000/</url>
-    <content><![CDATA[下了什刹海站，穿越狭长的胡同，就来到了后海。沿着岸边走约百米，便是宋庆龄故居。春和景明，波澜不兴。我们来到这里的时候，路人笑着和我们说，院里的西府海棠正开得茂盛。 
-宋庆龄在北京的居所十分静谧。江南的假山、流水、小桥，北方迂回的长亭、宽敞的院落，摇曳的枝条与细碎的阳光，一切都结合得恰到好处。 
-在展馆的中央，是宋庆龄与孙中山的合影。四周陈满了信件和手稿。我被这样一句话吸引了：
-
-我是幸福的，我想尽量帮助我的丈夫处理英文信件。……对我来说，结婚就好像进了学校一样，不过没有烦人的“考试”罢了。  ——宋庆龄 
-
-通过阅读回忆录以及展品摘要，我们得知：在长期的相处和共同战斗之中，宋庆龄与孙中山坠入了爱河，甚至不顾父母的反对，逃离软禁。巨大的年龄差异没能成为他们爱情的鸿沟，他们携手走向永恒。 
-孙中山送给宋庆龄的定情信物是一把小巧精致的手枪，她一直携带在身上。如今在展台上依旧熠熠生辉。 
-1925 年，孙中山在北京逝世，她陷入了巨大的悲恸之中，但却没有因此消沉。在一年后的国民党二大上，发表了坚持孙中山三大政策的演说。她接续过丈夫身上的重担，继续为中国人民的民主与自由、和平与发展奋斗着。宋庆龄为了丈夫的遗愿，再次踏上了旅居欧洲的行程。她访问了莫斯科，寻求革命道路，在前苏联和欧洲求学，与友人积极探讨革命理论。 
-宋庆龄为革命事业、和平事业和妇女儿童福利事业奋斗了终生。和孙中山一样，宋庆龄庆龄在国外接受了现代化的教育，萌生了先进的思想，在很多方面与孙中山先生相投。二人并不受封建思想观念的束缚，彼此奔赴成为眷属。早年，她谨慎热情地帮助孙中山先生处理各项事务，照顾他的生活，甚至是在危难关头毫不犹豫地挡在他地身前。体贴周到使得他得以安心的工作。在孙中山病逝后，她依然秉承着丈夫的志向，走向时代的风暴之眼。 
-回顾宋庆龄先生的一生，我们很难不从中得到启迪。宋庆龄先生有着一颗赤诚的心，一是对自己的丈夫忠诚，她同他一起战斗，为他仕病、完成了他的遗愿；二是对华夏民族赤城。不论我们将目光投向哪个时间节点，宋庆龄先生永远是同中华民族的利益站在一起的，她总是不顾自己的安危，在骤变之时勇敢地批判、指责走向歧途的国民党，她所做的一切，都是为了让百姓免受苦难，让主权得以保证。 
-出了展馆，再往前走十几米，就是和平鸽舍。宋庆龄先生享誉世界的另一个原因，便是她长期担任大量教育、妇女儿童等方面福利活动的要职，奔赴世界各地、前往第三世界的国家进行交流，成立大量基金会，矢志不渝地为中国和平乃至世界和平奋斗着。 
-一名女性能在这样纷乱复杂、风起云涌的时代做出如此之多的贡献，是很难想象的。 
-1981年5 月29日，民主与和平的斗士最终陨落了。她的故事、信件、手稿、画像、物件等被后人妥善地保存了下来，存放在这里，向公众展览。这里成为了一个爱国主义教育基地。 
-心中但有信念，无处不放光芒。 
-
-2022年4月于北京
-]]></content>
-      <tags>
-        <tag>随笔</tag>
-        <tag>历史</tag>
-        <tag>人物</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>关于梦境</title>
-    <url>/1900/01/01/0000/</url>
-    <content><![CDATA[先让时间无限倒退！此处标注的时间是计算机能够表示的最早时刻。这篇博文记录的文字没有经过加工，大多是我在半梦半醒的状态下记录下来的，读起来并不通顺。
-梦境与大脑的进化程度高度相关，从某种不严谨的角度来看，或许哺乳动物的第一个梦，最早能够追溯到三叠纪晚期。我们的祖先在梦中遭遇了什么，有何奇遇、梦里的事物是令他们幸福还是恐惧，现如今人们已经无从得知了。梦总是消逝的飞快，从梦中惊醒，仅仅片刻所有的思绪便消失的无影无踪。近年来因为压力与作息的缘故，我常常做梦，时而引人入胜，时而荒诞离奇。为此，我开了这篇博文，若有机缘，便立刻记录下来，留待日后玩味。
-《奇梦》（一）2023年10月13日；约莫1:00~8:28。注：自我在内蒙遭遇的事故发生后约20日。
-
-我梦到我和几位████同学（p?w, l?g，l?y，z?l，████，小学同学罗██y）策划了一场自驾旅行，旅游路线记不清了。这是一场很伟大的旅行  瑰丽  壮阔 有部分是在空中。我们先是才空中穿过了一部分地区，我乘坐的是类似摩托车一样的黑色热气球，我坐在上面仿佛坐着摩托车，气球是需要充气的，他们好像是坐直升飞机或者跟我一样。我们从空中穿过了大半个地球，其实更像是从太空中看到的 。很震撼，我们能从太空中看到各种各样的地貌，比如内蒙的自然地理环境，但是雪顶，但是为啥看着还会带地名的呢？ 有一部分地区再闹蝗灾，我们从空中经过的时候天空到处是蝗虫流与我们逆行  虽然在出发前看新闻就有预先心理准备了，但是经过的时候还是惊讶到了 然后是地上部分   我们下来后  我将热气球放气，然后将它折叠收进书包。我们骑着各自的电车，在曾经的西南山里的一个█████出发，又好像回到了高一时上下学电车大军的时代。
-我们路过████的那条街道，在对面████，然后又一次出发了。 我出发前还检查了行李，看看我的热气球还在不在。我们在红壹佰路与在江的路口左转，现在是████小学对面那条路的靠近████路的部分。我在这个地方和████聊了几句，我说我好像没带我电车的充电器。于是我开始忧虑这个，想着经过哪个地方的时候买一个。 但是因为下过雨，这里发生了路面塌陷，裹挟着泥泞的洪流遍地都是，然后在将要过马路的时候，那一部分道路塌陷比较严重，所以我花了点功夫才上去到主路，其实也就是一瞬间的事情，绿灯就走完了。但是这是突然前面有人举着爱心绿灯的牌子（是一个纸牌子但是上面有电子红绿灯和镶着光编的字）让我们这条路的人先过，就在这时，我身上有些瘙痒，然后我就醒了。
-醒来以后：很难以理解的是，我们策划的路线应该是由华北平原北上然后穿过内蒙向西，为啥后面路面旅行的部分却是在家乡的这些地方呢？另一个疑问是我们如何同样是一天多不到两天的时间里完成这么长的路线的旅行的？
-
-]]></content>
-      <tags>
-        <tag>随笔</tag>
-        <tag>记录</tag>
-        <tag>梦境</tag>
       </tags>
   </entry>
   <entry>
@@ -2146,6 +2101,51 @@ IGMP：组成员管理
         <tag>计算机网络</tag>
         <tag>网络层</tag>
         <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>关于宋庆龄</title>
+    <url>/2022/04/03/1000/</url>
+    <content><![CDATA[下了什刹海站，穿越狭长的胡同，就来到了后海。沿着岸边走约百米，便是宋庆龄故居。春和景明，波澜不兴。我们来到这里的时候，路人笑着和我们说，院里的西府海棠正开得茂盛。 
+宋庆龄在北京的居所十分静谧。江南的假山、流水、小桥，北方迂回的长亭、宽敞的院落，摇曳的枝条与细碎的阳光，一切都结合得恰到好处。 
+在展馆的中央，是宋庆龄与孙中山的合影。四周陈满了信件和手稿。我被这样一句话吸引了：
+
+我是幸福的，我想尽量帮助我的丈夫处理英文信件。……对我来说，结婚就好像进了学校一样，不过没有烦人的“考试”罢了。  ——宋庆龄 
+
+通过阅读回忆录以及展品摘要，我们得知：在长期的相处和共同战斗之中，宋庆龄与孙中山坠入了爱河，甚至不顾父母的反对，逃离软禁。巨大的年龄差异没能成为他们爱情的鸿沟，他们携手走向永恒。 
+孙中山送给宋庆龄的定情信物是一把小巧精致的手枪，她一直携带在身上。如今在展台上依旧熠熠生辉。 
+1925 年，孙中山在北京逝世，她陷入了巨大的悲恸之中，但却没有因此消沉。在一年后的国民党二大上，发表了坚持孙中山三大政策的演说。她接续过丈夫身上的重担，继续为中国人民的民主与自由、和平与发展奋斗着。宋庆龄为了丈夫的遗愿，再次踏上了旅居欧洲的行程。她访问了莫斯科，寻求革命道路，在前苏联和欧洲求学，与友人积极探讨革命理论。 
+宋庆龄为革命事业、和平事业和妇女儿童福利事业奋斗了终生。和孙中山一样，宋庆龄庆龄在国外接受了现代化的教育，萌生了先进的思想，在很多方面与孙中山先生相投。二人并不受封建思想观念的束缚，彼此奔赴成为眷属。早年，她谨慎热情地帮助孙中山先生处理各项事务，照顾他的生活，甚至是在危难关头毫不犹豫地挡在他地身前。体贴周到使得他得以安心的工作。在孙中山病逝后，她依然秉承着丈夫的志向，走向时代的风暴之眼。 
+回顾宋庆龄先生的一生，我们很难不从中得到启迪。宋庆龄先生有着一颗赤诚的心，一是对自己的丈夫忠诚，她同他一起战斗，为他仕病、完成了他的遗愿；二是对华夏民族赤城。不论我们将目光投向哪个时间节点，宋庆龄先生永远是同中华民族的利益站在一起的，她总是不顾自己的安危，在骤变之时勇敢地批判、指责走向歧途的国民党，她所做的一切，都是为了让百姓免受苦难，让主权得以保证。 
+出了展馆，再往前走十几米，就是和平鸽舍。宋庆龄先生享誉世界的另一个原因，便是她长期担任大量教育、妇女儿童等方面福利活动的要职，奔赴世界各地、前往第三世界的国家进行交流，成立大量基金会，矢志不渝地为中国和平乃至世界和平奋斗着。 
+一名女性能在这样纷乱复杂、风起云涌的时代做出如此之多的贡献，是很难想象的。 
+1981年5 月29日，民主与和平的斗士最终陨落了。她的故事、信件、手稿、画像、物件等被后人妥善地保存了下来，存放在这里，向公众展览。这里成为了一个爱国主义教育基地。 
+心中但有信念，无处不放光芒。 
+
+2022年4月于北京
+]]></content>
+      <tags>
+        <tag>随笔</tag>
+        <tag>历史</tag>
+        <tag>人物</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>关于梦境</title>
+    <url>/1900/01/01/0000/</url>
+    <content><![CDATA[先让时间无限倒退！此处标注的时间是计算机能够表示的最早时刻。这篇博文记录的文字没有经过加工，大多是我在半梦半醒的状态下记录下来的，读起来并不通顺。
+梦境与大脑的进化程度高度相关，从某种不严谨的角度来看，或许哺乳动物的第一个梦，最早能够追溯到三叠纪晚期。我们的祖先在梦中遭遇了什么，有何奇遇、梦里的事物是令他们幸福还是恐惧，现如今人们已经无从得知了。梦总是消逝的飞快，从梦中惊醒，仅仅片刻所有的思绪便消失的无影无踪。近年来因为压力与作息的缘故，我常常做梦，时而引人入胜，时而荒诞离奇。为此，我开了这篇博文，若有机缘，便立刻记录下来，留待日后玩味。
+《奇梦》（一）2023年10月13日；约莫1:00~8:28。注：自我在内蒙遭遇的事故发生后约20日。
+
+我梦到我和几位████同学（p?w, l?g，l?y，z?l，████，小学同学罗██y）策划了一场自驾旅行，旅游路线记不清了。这是一场很伟大的旅行  瑰丽  壮阔 有部分是在空中。我们先是才空中穿过了一部分地区，我乘坐的是类似摩托车一样的黑色热气球，我坐在上面仿佛坐着摩托车，气球是需要充气的，他们好像是坐直升飞机或者跟我一样。我们从空中穿过了大半个地球，其实更像是从太空中看到的 。很震撼，我们能从太空中看到各种各样的地貌，比如内蒙的自然地理环境，但是雪顶，但是为啥看着还会带地名的呢？ 有一部分地区再闹蝗灾，我们从空中经过的时候天空到处是蝗虫流与我们逆行  虽然在出发前看新闻就有预先心理准备了，但是经过的时候还是惊讶到了 然后是地上部分   我们下来后  我将热气球放气，然后将它折叠收进书包。我们骑着各自的电车，在曾经的西南山里的一个█████出发，又好像回到了高一时上下学电车大军的时代。
+我们路过████的那条街道，在对面████，然后又一次出发了。 我出发前还检查了行李，看看我的热气球还在不在。我们在红壹佰路与在江的路口左转，现在是████小学对面那条路的靠近████路的部分。我在这个地方和████聊了几句，我说我好像没带我电车的充电器。于是我开始忧虑这个，想着经过哪个地方的时候买一个。 但是因为下过雨，这里发生了路面塌陷，裹挟着泥泞的洪流遍地都是，然后在将要过马路的时候，那一部分道路塌陷比较严重，所以我花了点功夫才上去到主路，其实也就是一瞬间的事情，绿灯就走完了。但是这是突然前面有人举着爱心绿灯的牌子（是一个纸牌子但是上面有电子红绿灯和镶着光编的字）让我们这条路的人先过，就在这时，我身上有些瘙痒，然后我就醒了。
+醒来以后：很难以理解的是，我们策划的路线应该是由华北平原北上然后穿过内蒙向西，为啥后面路面旅行的部分却是在家乡的这些地方呢？另一个疑问是我们如何同样是一天多不到两天的时间里完成这么长的路线的旅行的？
+
+]]></content>
+      <tags>
+        <tag>随笔</tag>
+        <tag>记录</tag>
+        <tag>梦境</tag>
       </tags>
   </entry>
   <entry>
