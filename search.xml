@@ -83,145 +83,6 @@ Team 2430080
       </tags>
   </entry>
   <entry>
-    <title>Data Analysis-Week9~week13</title>
-    <url>/2023/05/15/2239/</url>
-    <content><![CDATA[Week 9
-在数据分析中，常常需要迭代的内容数据量过大，无法一次性加载。例如，在图像相关的深度学习任务中，由于数据总量过大，一次性加载全部数据耗时过长、内存占用过大，因此一般会采用批量加载数据的方法。现提供文件FaceImages.zip(http://vis-www.cs.umass.edu/fddb/originalPics.tar.gz，其中包含5000余张人脸图片。要求设计FaceDataset类，实现图片数据的加载。具体要求：
-
-该类至少有一个数据属性_path，来接收图片目录的路径，且该属性在实例化时通过参数来初始化。
-该类有一个生成器方法image_generator，能够生成一张图片数据的ndarray形式并返回（利用PIL库实现）。
-实现__iter__方法，使得该类支持迭代器相关的操作。
-实现__next__方法，根据类内的图片路径列表，迭代地加载并以ndarray形式返回图片数据。
-对上述生成器和迭代器相关的方法进行测试。
-（附加）实现__len__方法，返回数据集中图片的数量。
-（附加）实现__getitem__方法，使得该类的实例fd支持fd[i]的形式来获取第i+1个图片的ndarray。
-（附加）该类有一个生成器方法image_representation_generator方法，可以利有预训练模型Vgg或Restnet来生成图片的向量表示。
-（附加）尝试用预训练模型生成的向量来计算图片相似性（如两个向量之间的夹角等）。
-
-
-库import osimport numpy as npfrom PIL import Imagefrom keras_vggface.vggface import VGGFacefrom keras_vggface.utils import preprocess_inputimport tensorflow.python.keras.engineimport cv2import matplotlib.pyplot as pltimport sys
-
-FaceDataset 类class FaceDataset:    def __init__(self,path):        self._path=path        self._file_list=[file for file in os.listdir(self._path)]        self._start=0        self._length=len(self._file_list)        self._idx=self._start        self._model=VGGFace(model=&#x27;vgg16&#x27;)    def __iter__(self):        return self    def __next__(self):        if self._idx &gt;= self._length:            raise StopIteration        else:            imgg_array=self.__getitem__(self._idx)            self._idx+=1            return imgg_array    def __len__(self):        return len(self._file_list)    def __getitem__(self, idx):        imgg=Image.open(os.path.join(self._path,self._file_list[idx]))        imgg_data=imgg.getdata()        return np.reshape(imgg_data,(imgg.height,imgg.width,len(imgg.getbands())))    def image_generator(self):        for file in self._file_list:            imgg=Image.open(os.path.join(self._path,file))            imgg_data=imgg.getdata()            yield np.reshape(imgg_data,(imgg.height,imgg.width,len(imgg.getbands())))    def image_representation_generator(self):        for file_path in self._file_list:            imgg=Image.open(os.path.join(self._path,file_path))            imgg_array=np.reshape(imgg.getdata(),(imgg.height,imgg.width,len(imgg.getbands())))            pre_processed_imgg=preprocess_input(imgg_array)            pre_presented_imgg=self._model.predict(pre_processed_imgg)            yield pre_presented_imgg
-
-测试  __next__def main(): 			lib_path=&#x27;C:/Users/Administrator/Desktop/using_python/originalPics/2002/07/20/big&#x27;    dataset=FaceDataset(lib_path)    for image_array in dataset:        print(image_array.shape)if __name__ == &#x27;__main__&#x27;:    main()
-
-测试  image_generatordef main():        lib_path=&#x27;C:/Users/Administrator/Desktop/using_python/originalPics/2002/07/20/big&#x27;    dataset=FaceDataset(lib_path)    for image_array in dataset.image_generator():        print(image_array.shape)if __name__ == &#x27;__main__&#x27;:    main()
-
-测试__len__ 和__getitem__def main():lib_path=&#x27;C:/Users/Administrator/Desktop/using_python/originalPics/2002/07/20/big&#x27;    dataset=FaceDataset(lib_path)    print(len(dataset))    print(dataset[0].shape)if __name__ == &#x27;__main__&#x27;:    main()
-
-用预训练模型生成的向量来计算图片相似性增加库from sklearn.metrics.pairwise import cosine_similarity 
-
-修改FaceDataset中的部分方法class FaceDataset:    def image_generator(self):        for file in self._file_list:            imgg=Image.open(os.path.join(self._path,file))            imgg_data=imgg.getdata()            yield np.reshape(imgg_data,(imgg.height,imgg.width,len(imgg.getbands())))    def image_representation_generator(self):        for file_path in self._file_list:            img_path = os.path.join(self._path, file_path)            imgg_array = cv2.imread(img_path)            imgg_array = cv2.cvtColor(imgg_array, cv2.COLOR_BGR2RGB)            imgg_array = cv2.resize(imgg_array, (224, 224))            imgg_array = np.expand_dims(imgg_array, axis=0)            pre_processed_imgg = preprocess_input(imgg_array.astype(&#x27;float32&#x27;))            pre_presented_imgg = self._model.predict(pre_processed_imgg)            yield pre_presented_imgg
-
-测试函数def main():    lib_path = &#x27;C:/Users/Administrator/Desktop/using_python/originalPics/2002/07/20/big&#x27;    dataset = FaceDataset(lib_path)    vector=[]    model=VGGFace(model=&#x27;vgg16&#x27;,include_top=False,input_shape=(224,224,3),pooling=&#x27;avg&#x27;)    for ele in dataset.image_representation_generator():        vector.append(ele)    for ele in range(len(vector)):        for tlt in range(ele,len(vector)):            sim=cosine_similarity(vector[ele],vector[tlt])[0][0]            print(f&quot;image &#123;ele+1&#125; &amp; image &#123;tlt+1&#125; similarity:&#123;sim:.2f&#125;&quot;)if __name__ == &#x27;__main__&#x27;:    main()
-
-Week 11
-当需要计算多段音频统的音高等特征时，串行计算往往需要耗费较长的时间。本周作业要求利用librosa库以及Python多进程实现对多个音频的并行特征计算：
-
-主进程读取声音数据目录，得到所有声音文件的列表；
-直接使用Process类构建子进程，利用libraso提供的支持来计算音高和声强，并保存计算结果到文件（一个声音一个文件 ）。
-通过继承Process类来构建子进程，同样利用libraso提供的支持来计算音高和声强，并保存计算结果到文件（一个声音一个文件 ）。
-在主进程中启动利用2，3中构建的子进程，并分发（如通过队列）参数（声音文件名）。
-
-5（附加）. 观察在一定数目的声音文件处理时（建议文件多一些），子进程数目变化与处理总时长的关系。
-6（附加）. 如果修改2，3中的要求，不再为每个声音保存一个文件，而是将所有声音的结果保存到一个文件中，应该如何处理？比如，计算子进程会将结果写入一个队列，而一个新的Writer子进程将负责从队列里读取内容并写入一个特定的汇总文件。参考资料
-https://librosa.org/doc/latest/generated/librosa.yin.html#librosa.yinhttps://librosa.org/doc/latest/generated/librosa.amplitude_to_db.html#librosa.amplitude_to_db
-
-完整代码库import multiprocessing as mpimport osimport librosaimport timeimport matplotlib.pyplot as pltimport numpy as np
-
-基本代码def main_process(path):    wav_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            wav_doc_list.append(os.path.join(path, file))    return wav_doc_listdef sub_process(queue):    while not queue.empty():        path = queue.get()        write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)        with open(write_in_path, &#x27;w&#x27;) as f:            y, sr = librosa.load(path, sr=None)            pitches, magnitudes = librosa.piptrack(y=y, sr=sr)            data = &#x27;pitches: &#x27; + str(pitches) + &#x27;\n&#x27;+&#x27; magnitudes: &#x27; + str(magnitudes) + &#x27;\n&#x27;            f.write(data)class SubProcess(multiprocessing.Process):    def __init__(self, queue):        super().__init__()        self.queue = queue    def run(self):        while not self.queue.empty():            path = self.queue.get()            write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)            with open(write_in_path, &#x27;w&#x27;) as f:                y, sr = librosa.load(path, sr=None)                pitches, magnitudes = librosa.piptrack(y=y, sr=sr)                data = f&#x27;pitches: &#123;str(pitches)&#125;\n magnitudes: &#123;str(magnitudes)&#125;\n&#x27;                f.write(data)
-
-
-直接使用Process类构建子进程
-
-直接使用Process类构建子进程，利用libraso提供的支持来计算音高和声强，并保存计算结果到文件（一个声音一个文件 ）。
-
-在主进程中启动利用2，3中构建的子进程，并分发（如通过队列）参数（声音文件名）。
-
-
-
-def main_process(path):    mp3_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            mp3_doc_list.append(os.path.join(path, file))    return mp3_doc_listdef sub_process(queue):    while not queue.empty():        path = queue.get()        write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)        with open(write_in_path, &#x27;w&#x27;) as f:            y, sr = librosa.load(path, sr=None)            pitches, magnitudes = librosa.piptrack(y=y, sr=sr)            data = &#x27;pitches: &#x27; + str(pitches) + &#x27;\n&#x27;+&#x27; magnitudes: &#x27; + str(magnitudes) + &#x27;\n&#x27;            f.write(data)def main():    path = &#x27;C:/Users/Administrator/Desktop/using_python/wav_list&#x27;    doc_list = main_process(path=path)    queue = multiprocessing.Queue()    processes = []    for file in doc_list:        queue.put(file)    for _ in range(len(doc_list)):        pro_ = multiprocessing.Process(target=sub_process, args=(queue,))        pro_.start()        processes.append(pro_)    for ele in processes:        ele.join()    print(&#x27;已完成。&#x27;)if __name__ == &#x27;__main__&#x27;:    main()
-
-通过继承Process类来构建子进程
-
-通过继承Process类来构建子进程，同样利用libraso提供的支持来计算音高和声强，并保存计算结果到文件（一个声音一个文件 ）。
-
-在主进程中启动利用2，3中构建的子进程，并分发（如通过队列）参数（声音文件名）。
-
-
-
-def main_process(path):    wav_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            wav_doc_list.append(os.path.join(path, file))    return wav_doc_listclass SubProcess(multiprocessing.Process):    def __init__(self, queue):        super().__init__()        self.queue = queue    def run(self):        while not self.queue.empty():            path = self.queue.get()            write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)            with open(write_in_path, &#x27;w&#x27;) as f:                y, sr = librosa.load(path, sr=None)                pitches, magnitudes = librosa.piptrack(y=y, sr=sr)                data = f&#x27;pitches: &#123;str(pitches)&#125;\n magnitudes: &#123;str(magnitudes)&#125;\n&#x27;                f.write(data)def main():    path = &#x27;C:/Users/Administrator/Desktop/using_python/wav_list&#x27;    doc_list = main_process(path=path)    queue = multiprocessing.Queue()    processes = []    for file in doc_list:        queue.put(file)    for _ in range(len(doc_list)):        pro_ = SubProcess(queue=queue)        pro_.start()        processes.append(pro_)    for ele in processes:        ele.join()    print(&#x27;已完成。&#x27;)if __name__ == &#x27;__main__&#x27;:    main()
-
-探究子进程数目与运行时长的关系
-5（附加）. 观察在一定数目的声音文件处理时（建议文件多一些），子进程数目变化与处理总时长的关系。
-
-* 为了方便后续测试起见，以下代码中略去了最后一步文件写入的步骤。
-def main_process(path):    wav_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            wav_doc_list.append(os.path.join(path, file))    return wav_doc_listdef sub_process(path):    write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)    with open(write_in_path, &#x27;w&#x27;) as f:        y, sr = librosa.load(path, sr=None)        pitches, magnitudes = librosa.piptrack(y=y, sr=sr)        data = f&#x27;pitches: &#123;str(pitches)&#125;\n magnitudes: &#123;str(magnitudes)&#125;\n&#x27;        # f.write(data)def main():    path = &#x27;C:/Users/Administrator/Desktop/using_python/wav_list&#x27;    doc_list = main_process(path=path)    start=time.time()    pool = mp.Pool(processes=1)    result = pool.map(sub_process, doc_list)    end=time.time()    print(f&#x27;已完成, 耗时:&#123;end-start&#125;s&#x27;)if __name__ == &#x27;__main__&#x27;:    main()
-
-测试结果当processes==1时，耗时9.906246900558472s。
-当processes==3时，耗时4.453998327255249s。
-当processes==5时，耗时4.425124406814575s。
-当processes==7时，耗时4.3829286098480225s。
-当processes==8时，耗时4.366180181503296s。
-当processes==9时，耗时4.445085048675537s。
-当processes==12时，耗时4.432607412338257s。
-可以初步猜测随着进程数的增加，程序耗时向下降后上升。当进程数为8时，耗时达到最小。
-完整测试测试代码def main_process(path):    wav_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            wav_doc_list.append(os.path.join(path, file))    return wav_doc_listdef sub_process(path):    write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)    with open(write_in_path, &#x27;w&#x27;) as f:        y, sr = librosa.load(path, sr=None)        pitches, magnitudes = librosa.piptrack(y=y, sr=sr)        data = f&#x27;pitches: &#123;str(pitches)&#125;\n magnitudes: &#123;str(magnitudes)&#125;\n&#x27;        # f.write(data)def main():    path = &#x27;C:/Users/Administrator/Desktop/using_python/wav_list&#x27;    doc_list = main_process(path=path)    x_list=[i for i in range(1,20)]    y_list=[]    for i in x_list:        start=time.time()        pool = mp.Pool(processes=i)        result = pool.map(sub_process, doc_list)        end=time.time()        y_list.append(end-start)    plt.title(&quot;Points and Fitting Curve&quot;)    plt.xlabel(&quot;process num/(int)&quot;)    plt.ylabel(&quot;time cost/(s)&quot;)    plt.grid(True)    plt.xlim(min(x_list) - 1, max(x_list) + 1)    plt.ylim(min(y_list) - 1, max(y_list) + 1)    plt.plot(x_list, y_list, &quot;ro&quot;)    for i in range(len(x_list)):        plt.annotate(&quot;(&#123;:.1f&#125;, &#123;:.1f&#125;)&quot;.format(x_list[i], y_list[i]), xy=(x_list[i], y_list[i]), xytext=(-15, 15),                     textcoords=&quot;Process num via time cost&quot;, ha=&quot;center&quot;, va=&quot;top&quot;)    coefficients = np.polyfit(np.array(x_list), np.array(y_list), 3)    p = np.poly1d(coefficients)    x_range = np.linspace(min(x_list) - 1, max(x_list) + 1, 1000)    y_range = p(x_range)    plt.plot(x_range, y_range, &quot;b-&quot;)    plt.show()if __name__ == &#x27;__main__&#x27;:    main()
-
-结论可见，随着进程数的增加，程序耗时向下降后上升。当进程数为8时，耗时达到最小。
-Week 12
-利用Python的多线程实现音频文件的采集，并计算语速。
-
-通过类继承，实现一个线程类，参考voa.py中的示例，从https://www.51voa.com/VOA_Standard_3.html (其中 “3”可被替换为其他数字，对应翻页操作)中获取新的链接地址列表。
-通过类继承，实现一个线程类，参考voa.py中的示例，从1中获取的链接（如https://www.51voa.com/VOA_Standard_English/u-s-supports-diversity-of-energy-sources-in-europe-79541.html）获取mp3文件链接。
-通过类继承，实现一个线程类，参考voa.py中的示例，利用2中的mp3文件链接（如https://files.51voa.cn/201806/fighting-tb-in-uzbekistan.mp3），将文件保存到本地。
-通过类继承，实现一个线程类，参考sr.py中的示例，对存储的音频文件计算语速。
-设计一种同步策略（比如用线程池，或锁，或队列等），实现1，2，3，4中几种不同功能线程的配合，实现多线程的mp3文件下载功能，并进行语速的计算和输出。
-(附加)考虑到Python的多进程更适合计算密集型的任务，可否在4中不使用线程，而使用多进程来计算存储文件的语速？即主进程的多线程负责音频文件的下载与存储，另几个子进程则负责语速计算。比较一下与5中线程设计的速度差异。
-（附加）音频采集如果时间过长，可能会因为外部因素（网络等）出现意外的中断，可否设计一种“断点”的记录机制，使得即使采集过程被打断，也能够从上次的断点继续开始，避免重复采集。
-
-
-库import threadingfrom threading import *import requestsfrom lxml import etreefrom tqdm import tqdmimport reimport waveimport datetimeimport timeimport librosaimport queueimport matplotlib.pyplot as pltimport sysimport os
-
-
-
-主体class VoaThread(Thread):    def __init__(self,start_page,end_page,link_list):        super().__init__()        self.start_page=start_page        self.end_page=end_page        self.link_list=link_list    def run(self):        for i in range(self.start_page,self.end_page):            url = f&#x27;https://www.51voa.com/VOA_Standard_&#123;i&#125;.html&#x27;            response=requests.get(url)            html=etree.HTML(response.text)            links=[]            for j in range(0,50):                links = links+html.xpath(&#x27;//*[@id=&quot;righter&quot;]/div[3]/ul/li[%s]/a/@href&#x27;%str(j))            for ele in links:                self.link_list.append(ele)class GetMP3Thread(Thread):    def __init__(self,link_list):        super().__init__()        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;        self.link_list=link_list        self.mlist=[]    def run(self):        for link in tqdm(self.link_list[:5]):            url=&#x27;https://www.51voa.com&#x27;+link            response=requests.get(url,headers=self.headers)            self.mlist = self.mlist+list(set(re.findall(r&#x27;https://.+?\.mp3&#x27;, response.text)))class DownloadMP3Thread(Thread):    def __init__(self, mlist, directory=&#x27;.&#x27;):        super().__init__()        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;        self.mlist = mlist        self.directory = directory    def run(self):        for murl in tqdm(self.mlist):            mp3_stream = requests.get(murl, headers=self.headers).content            fname = murl[murl.rfind(&#x27;/&#x27;) + 1:]            path = os.path.join(self.directory, fname)            with open(path, &#x27;wb&#x27;) as f:                f.write(mp3_stream)                class SpeechRateThread(Thread):    def __init__(self, filename):        super().__init__()        self.filename = filename        self.words_per_second = None    def run(self):        y, sr = librosa.load(self.filename, sr=None)        onsets = librosa.onset.onset_detect(y=y, sr=sr, units=&quot;time&quot;, hop_length=128, backtrack=False)        number_of_words = len(onsets)        duration = len(y) / sr        self.words_per_second = number_of_words / duration    def get_words_per_second(self):        return self.words_per_second
-
-
-
-获取链接并下载MP3文件问题：
-
-通过类继承，实现一个线程类，参考voa.py中的示例，从https://www.51voa.com/VOA_Standard_3.html (其中 “3”可被替换为其他数字，对应翻页操作)中获取新的链接地址列表。
-通过类继承，实现一个线程类，参考voa.py中的示例，从1中获取的链接（如https://www.51voa.com/VOA_Standard_English/u-s-supports-diversity-of-energy-sources-in-europe-79541.html）获取mp3文件链接。
-通过类继承，实现一个线程类，参考voa.py中的示例，利用2中的mp3文件链接（如https://files.51voa.cn/201806/fighting-tb-in-uzbekistan.mp3），将文件保存到本地。
-
-
-测试代码：def main():    link_list = []    voa_thread = VoaThread(1, 6, link_list)    voa_thread.start()    voa_thread.join()    get_mp3_thread = GetMP3Thread(link_list)    get_mp3_thread.start()    get_mp3_thread.join()    download_mp3_thread = DownloadMP3Thread(get_mp3_thread.mlist,&#x27;C:/Users/Administrator/Desktop/save_path&#x27;)    download_mp3_thread.start()    download_mp3_thread.join()if __name__ == &#x27;__main__&#x27;:    main()
-
-测试结果：计算对应音频文件的语速问题：
-
-通过类继承，实现一个线程类，参考sr.py中的示例，对存储的音频文件计算语速。
-
-
-测试代码：def main():        link_list = []        voa_thread = VoaThread(1, 6, link_list)        voa_thread.start()        voa_thread.join()        get_mp3_thread = GetMP3Thread(link_list)        get_mp3_thread.start()        get_mp3_thread.join()        download_mp3_thread = DownloadMP3Thread(get_mp3_thread.mlist)        download_mp3_thread.start()        download_mp3_thread.join()        for mp3_file in get_mp3_thread.mlist:            speechrate_thread = SpeechRateThread(mp3_file)            speechrate_thread.start()            speechrate_thread.join()            words_per_second = speechrate_thread.get_words_per_second()            print(f&quot;&#123;os.path.basename(mp3_file)&#125;: &#123;words_per_second&#125; words-per-second&quot;)if __name__ == &#x27;__main__&#x27;:    main()
-
-运行结果同步策略主体改动：class VoaThread(Thread):    def __init__(self,start_page,end_page,link_queue):        super().__init__()        self.start_page=start_page        self.end_page=end_page        self.link_queue=link_queue    def run(self):        for i in range(self.start_page,self.end_page):            url = f&#x27;https://www.51voa.com/VOA_Standard_&#123;i&#125;.html&#x27;            response=requests.get(url)            html=etree.HTML(response.text)            links=[]            for j in range(0,50):                links = links+html.xpath(&#x27;//*[@id=&quot;righter&quot;]/div[3]/ul/li[%s]/a/@href&#x27;%str(j))            for ele in links:                self.link_queue.put(ele)class GetMP3Thread(Thread):    def __init__(self,link_queue, mlist_queue):        super().__init__()        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;        self.link_queue=link_queue        self.mlist_queue=mlist_queue    def run(self):        while not self.link_queue.empty():            link = self.link_queue.get()            url=&#x27;https://www.51voa.com&#x27;+link            response=requests.get(url,headers=self.headers)            mlist = list(set(re.findall(r&#x27;https://.+?\.mp3&#x27;, response.text)))            for murl in mlist:                self.mlist_queue.put(murl)class DownloadMP3Thread(Thread):    def __init__(self, mlist_queue, directory=&#x27;.&#x27;):        super().__init__()        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;        self.mlist_queue = mlist_queue        self.directory = directory    def run(self):        while not self.mlist_queue.empty():            murl = self.mlist_queue.get()            mp3_stream = requests.get(murl, headers=self.headers).content            fname = murl[murl.rfind(&#x27;/&#x27;) + 1:]            path = os.path.join(self.directory, fname)            with open(path, &#x27;wb&#x27;) as f:                f.write(mp3_stream)class SpeechRateThread(Thread):    def __init__(self, filename, words_per_second_queue):        super().__init__()        self.filename = filename        self.words_per_second_queue = words_per_second_queue    def run(self):        y, sr = librosa.load(self.filename, sr=None)        onsets = librosa.onset.onset_detect(y=y, sr=sr, units=&quot;time&quot;, hop_length=128, backtrack=False)        number_of_words = len(onsets)        duration = len(y) / sr        words_per_second = number_of_words / duration        self.words_per_second_queue.put(words_per_second)
-
-测试代码：def main():    link_queue = queue.Queue()    mlist_queue = queue.Queue()    words_per_second_queue = queue.Queue()    voa_thread = VoaThread(1, 6, link_queue)    voa_thread.start()    voa_thread.join()    get_mp3_thread = GetMP3Thread(link_queue, mlist_queue)    get_mp3_thread.start()    download_mp3_threads = []    for i in range(5):        download_mp3_thread = DownloadMP3Thread(mlist_queue)        download_mp3_thread.start()        download_mp3_threads.append(download_mp3_thread)    get_mp3_thread.join()    speechrate_threads = []    for mp3_file in get_mp3_thread.mlist:        speechrate_thread = SpeechRateThread(mp3_file, words_per_second_queue)        speechrate_thread.start()        speechrate_threads.append(speechrate_thread)    for speechrate_thread in speechrate_threads:        speechrate_thread.join()    for i, mp3_file in enumerate(get_mp3_thread.mlist):        words_per_second = words_per_second_queue.get()        print(f&quot;&#123;i+1&#125;. &#123;os.path.basename(mp3_file)&#125;: &#123;words_per_second:.2f&#125; words-per-second&quot;)    for download_mp3_thread in download_mp3_threads:        download_mp3_thread.join()if __name__ == &#x27;__main__&#x27;:    main()
-
-Week 13作业描述
-协程有时被称为“微线程”，因为二者有类似的使用场景。和线程相比，协程占用资源更少、切换迅速，且实现简单（如协程是协作式调用，一般不用考虑资源的抢占，所以大部分情况下不需要通过同步原语来避免冲突）。通常协程被用在高并发的IO场景中。本周要求利用协程，实现一个协程爬虫类 VoaCrawler ，对第十二周作业的数据采集部分进行重新实现，即用协程实现Mp3音频文件的爬取（可以使用 gevent , aiohttop等第三方库），用 aiofiles 实现音频文件的存储。如果有余力，也可以继续改进 Bilibili_Crawler.py中的例子，使用 aiofiles 等进行文件存储，并测试大规模视频同时获取是否可行。
-
-代码import asyncioimport aiohttpimport aiofilesfrom lxml import etreefrom tqdm import tqdmimport reimport osclass VoaCrawler:    def __init__(self, start_page, end_page):        self.start_page = start_page        self.end_page = end_page        self.link_list = []        self.mlist = []        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;    async def get_links(self):        for i in range(self.start_page, self.end_page):            url = f&#x27;https://www.51voa.com/VOA_Standard_&#123;i&#125;.html&#x27;            async with aiohttp.ClientSession() as session:                async with session.get(url) as response:                    html = etree.HTML(await response.text())                    links = []                    for j in range(0, 50):                        links = links + html.xpath(&#x27;//*[@id=&quot;righter&quot;]/div[3]/ul/li[%s]/a/@href&#x27; % str(j))                    for ele in links:                        self.link_list.append(ele)    async def get_mp3(self):        async with aiohttp.ClientSession() as session:            for link in tqdm(self.link_list[:5]):                url = &#x27;https://www.51voa.com&#x27; + link                async with session.get(url, headers=self.headers) as response:                    self.mlist = self.mlist + list(set(re.findall(r&#x27;https://.+?\.mp3&#x27;, await response.text())))    async def download_mp3(self, directory=&#x27;.&#x27;):        async with aiohttp.ClientSession() as session:            for murl in tqdm(self.mlist):                mp3_stream = await session.get(murl, headers=self.headers)                fname = murl[murl.rfind(&#x27;/&#x27;) + 1:]                path = os.path.join(directory, fname)                async with aiofiles.open(path, &#x27;wb&#x27;) as f:                    await f.write(await mp3_stream.read())    async def run(self):        await self.get_links()        await self.get_mp3()        await self.download_mp3()        if __name__ == &#x27;__main__&#x27;:    crawler = VoaCrawler(1, 2)    asyncio.run(crawler.run())
-
-运行结果]]></content>
-      <tags>
-        <tag>机器学习</tag>
-        <tag>数据分析</tag>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>【计算机网络】第四章-网络层(上)</title>
     <url>/2025/03/24/2121/</url>
     <content><![CDATA[4.1 网络层的功能网络层的功能
@@ -1150,6 +1011,199 @@ IGMP：组成员管理
       </tags>
   </entry>
   <entry>
+    <title>【数据结构】第二章-线性表</title>
+    <url>/2025/03/25/1558/</url>
+    <content><![CDATA[【数据结构】第二章-线性表线性表的定义线性表是具有相同数据类型的n（n≥0）个数据元素的有限序列，其中n为表长，当n&#x3D;0时线性表是一个空表。
+线性表的基本操作
+InitList(&amp;L): 初始化表。构造一个空的线性表L，分配内存空间。
+DestroyList(&amp;L): 销毁操作。销毁线性表，并释放线性表L所占用的内存空间。
+ListInsert(&amp;L,i,e): 插入操作。在表L中的第i个位置上插入指定元素e。
+ListDelete(&amp;L,i,&amp;e): 删除操作。删除表L中第i个位置的元素，并用e返回删除元素的值。
+LocateElem(L,e): 按值查找操作。在表L中查找具有给定关键字值的元素。
+GetElem(L,i): 按位查找操作。获取表L中第i个位置的元素的值。
+
+线性表的特点
+表中元素的个数有限
+表中元素具有逻辑上的顺序性，在序列中各元素排列有其先后次序
+表中元素都是数据元素，每个元素都是单个元素
+表中元素的数据类型都相同，这意味着每个元素占有相同大小的存储空间
+表中元素具有抽象性，即仅讨论元素间的逻辑关系，而不考虑元素究竟表示什么内容
+
+]]></content>
+      <tags>
+        <tag>408</tag>
+        <tag>数据结构</tag>
+        <tag>线性表</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>关于宋庆龄</title>
+    <url>/2022/04/03/1000/</url>
+    <content><![CDATA[下了什刹海站，穿越狭长的胡同，就来到了后海。沿着岸边走约百米，便是宋庆龄故居。春和景明，波澜不兴。我们来到这里的时候，路人笑着和我们说，院里的西府海棠正开得茂盛。 
+宋庆龄在北京的居所十分静谧。江南的假山、流水、小桥，北方迂回的长亭、宽敞的院落，摇曳的枝条与细碎的阳光，一切都结合得恰到好处。 
+在展馆的中央，是宋庆龄与孙中山的合影。四周陈满了信件和手稿。我被这样一句话吸引了：
+
+我是幸福的，我想尽量帮助我的丈夫处理英文信件。……对我来说，结婚就好像进了学校一样，不过没有烦人的“考试”罢了。  ——宋庆龄 
+
+通过阅读回忆录以及展品摘要，我们得知：在长期的相处和共同战斗之中，宋庆龄与孙中山坠入了爱河，甚至不顾父母的反对，逃离软禁。巨大的年龄差异没能成为他们爱情的鸿沟，他们携手走向永恒。 
+孙中山送给宋庆龄的定情信物是一把小巧精致的手枪，她一直携带在身上。如今在展台上依旧熠熠生辉。 
+1925 年，孙中山在北京逝世，她陷入了巨大的悲恸之中，但却没有因此消沉。在一年后的国民党二大上，发表了坚持孙中山三大政策的演说。她接续过丈夫身上的重担，继续为中国人民的民主与自由、和平与发展奋斗着。宋庆龄为了丈夫的遗愿，再次踏上了旅居欧洲的行程。她访问了莫斯科，寻求革命道路，在前苏联和欧洲求学，与友人积极探讨革命理论。 
+宋庆龄为革命事业、和平事业和妇女儿童福利事业奋斗了终生。和孙中山一样，宋庆龄庆龄在国外接受了现代化的教育，萌生了先进的思想，在很多方面与孙中山先生相投。二人并不受封建思想观念的束缚，彼此奔赴成为眷属。早年，她谨慎热情地帮助孙中山先生处理各项事务，照顾他的生活，甚至是在危难关头毫不犹豫地挡在他地身前。体贴周到使得他得以安心的工作。在孙中山病逝后，她依然秉承着丈夫的志向，走向时代的风暴之眼。 
+回顾宋庆龄先生的一生，我们很难不从中得到启迪。宋庆龄先生有着一颗赤诚的心，一是对自己的丈夫忠诚，她同他一起战斗，为他仕病、完成了他的遗愿；二是对华夏民族赤城。不论我们将目光投向哪个时间节点，宋庆龄先生永远是同中华民族的利益站在一起的，她总是不顾自己的安危，在骤变之时勇敢地批判、指责走向歧途的国民党，她所做的一切，都是为了让百姓免受苦难，让主权得以保证。 
+出了展馆，再往前走十几米，就是和平鸽舍。宋庆龄先生享誉世界的另一个原因，便是她长期担任大量教育、妇女儿童等方面福利活动的要职，奔赴世界各地、前往第三世界的国家进行交流，成立大量基金会，矢志不渝地为中国和平乃至世界和平奋斗着。 
+一名女性能在这样纷乱复杂、风起云涌的时代做出如此之多的贡献，是很难想象的。 
+1981年5 月29日，民主与和平的斗士最终陨落了。她的故事、信件、手稿、画像、物件等被后人妥善地保存了下来，存放在这里，向公众展览。这里成为了一个爱国主义教育基地。 
+心中但有信念，无处不放光芒。 
+
+2022年4月于北京
+]]></content>
+      <tags>
+        <tag>随笔</tag>
+        <tag>宋庆龄</tag>
+        <tag>历史</tag>
+        <tag>人物</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Data Analysis-Week9~week13</title>
+    <url>/2023/05/15/2239/</url>
+    <content><![CDATA[Week 9
+在数据分析中，常常需要迭代的内容数据量过大，无法一次性加载。例如，在图像相关的深度学习任务中，由于数据总量过大，一次性加载全部数据耗时过长、内存占用过大，因此一般会采用批量加载数据的方法。现提供文件FaceImages.zip(http://vis-www.cs.umass.edu/fddb/originalPics.tar.gz，其中包含5000余张人脸图片。要求设计FaceDataset类，实现图片数据的加载。具体要求：
+
+该类至少有一个数据属性_path，来接收图片目录的路径，且该属性在实例化时通过参数来初始化。
+该类有一个生成器方法image_generator，能够生成一张图片数据的ndarray形式并返回（利用PIL库实现）。
+实现__iter__方法，使得该类支持迭代器相关的操作。
+实现__next__方法，根据类内的图片路径列表，迭代地加载并以ndarray形式返回图片数据。
+对上述生成器和迭代器相关的方法进行测试。
+（附加）实现__len__方法，返回数据集中图片的数量。
+（附加）实现__getitem__方法，使得该类的实例fd支持fd[i]的形式来获取第i+1个图片的ndarray。
+（附加）该类有一个生成器方法image_representation_generator方法，可以利有预训练模型Vgg或Restnet来生成图片的向量表示。
+（附加）尝试用预训练模型生成的向量来计算图片相似性（如两个向量之间的夹角等）。
+
+
+库import osimport numpy as npfrom PIL import Imagefrom keras_vggface.vggface import VGGFacefrom keras_vggface.utils import preprocess_inputimport tensorflow.python.keras.engineimport cv2import matplotlib.pyplot as pltimport sys
+
+FaceDataset 类class FaceDataset:    def __init__(self,path):        self._path=path        self._file_list=[file for file in os.listdir(self._path)]        self._start=0        self._length=len(self._file_list)        self._idx=self._start        self._model=VGGFace(model=&#x27;vgg16&#x27;)    def __iter__(self):        return self    def __next__(self):        if self._idx &gt;= self._length:            raise StopIteration        else:            imgg_array=self.__getitem__(self._idx)            self._idx+=1            return imgg_array    def __len__(self):        return len(self._file_list)    def __getitem__(self, idx):        imgg=Image.open(os.path.join(self._path,self._file_list[idx]))        imgg_data=imgg.getdata()        return np.reshape(imgg_data,(imgg.height,imgg.width,len(imgg.getbands())))    def image_generator(self):        for file in self._file_list:            imgg=Image.open(os.path.join(self._path,file))            imgg_data=imgg.getdata()            yield np.reshape(imgg_data,(imgg.height,imgg.width,len(imgg.getbands())))    def image_representation_generator(self):        for file_path in self._file_list:            imgg=Image.open(os.path.join(self._path,file_path))            imgg_array=np.reshape(imgg.getdata(),(imgg.height,imgg.width,len(imgg.getbands())))            pre_processed_imgg=preprocess_input(imgg_array)            pre_presented_imgg=self._model.predict(pre_processed_imgg)            yield pre_presented_imgg
+
+测试  __next__def main(): 			lib_path=&#x27;C:/Users/Administrator/Desktop/using_python/originalPics/2002/07/20/big&#x27;    dataset=FaceDataset(lib_path)    for image_array in dataset:        print(image_array.shape)if __name__ == &#x27;__main__&#x27;:    main()
+
+测试  image_generatordef main():        lib_path=&#x27;C:/Users/Administrator/Desktop/using_python/originalPics/2002/07/20/big&#x27;    dataset=FaceDataset(lib_path)    for image_array in dataset.image_generator():        print(image_array.shape)if __name__ == &#x27;__main__&#x27;:    main()
+
+测试__len__ 和__getitem__def main():lib_path=&#x27;C:/Users/Administrator/Desktop/using_python/originalPics/2002/07/20/big&#x27;    dataset=FaceDataset(lib_path)    print(len(dataset))    print(dataset[0].shape)if __name__ == &#x27;__main__&#x27;:    main()
+
+用预训练模型生成的向量来计算图片相似性增加库from sklearn.metrics.pairwise import cosine_similarity 
+
+修改FaceDataset中的部分方法class FaceDataset:    def image_generator(self):        for file in self._file_list:            imgg=Image.open(os.path.join(self._path,file))            imgg_data=imgg.getdata()            yield np.reshape(imgg_data,(imgg.height,imgg.width,len(imgg.getbands())))    def image_representation_generator(self):        for file_path in self._file_list:            img_path = os.path.join(self._path, file_path)            imgg_array = cv2.imread(img_path)            imgg_array = cv2.cvtColor(imgg_array, cv2.COLOR_BGR2RGB)            imgg_array = cv2.resize(imgg_array, (224, 224))            imgg_array = np.expand_dims(imgg_array, axis=0)            pre_processed_imgg = preprocess_input(imgg_array.astype(&#x27;float32&#x27;))            pre_presented_imgg = self._model.predict(pre_processed_imgg)            yield pre_presented_imgg
+
+测试函数def main():    lib_path = &#x27;C:/Users/Administrator/Desktop/using_python/originalPics/2002/07/20/big&#x27;    dataset = FaceDataset(lib_path)    vector=[]    model=VGGFace(model=&#x27;vgg16&#x27;,include_top=False,input_shape=(224,224,3),pooling=&#x27;avg&#x27;)    for ele in dataset.image_representation_generator():        vector.append(ele)    for ele in range(len(vector)):        for tlt in range(ele,len(vector)):            sim=cosine_similarity(vector[ele],vector[tlt])[0][0]            print(f&quot;image &#123;ele+1&#125; &amp; image &#123;tlt+1&#125; similarity:&#123;sim:.2f&#125;&quot;)if __name__ == &#x27;__main__&#x27;:    main()
+
+Week 11
+当需要计算多段音频统的音高等特征时，串行计算往往需要耗费较长的时间。本周作业要求利用librosa库以及Python多进程实现对多个音频的并行特征计算：
+
+主进程读取声音数据目录，得到所有声音文件的列表；
+直接使用Process类构建子进程，利用libraso提供的支持来计算音高和声强，并保存计算结果到文件（一个声音一个文件 ）。
+通过继承Process类来构建子进程，同样利用libraso提供的支持来计算音高和声强，并保存计算结果到文件（一个声音一个文件 ）。
+在主进程中启动利用2，3中构建的子进程，并分发（如通过队列）参数（声音文件名）。
+
+5（附加）. 观察在一定数目的声音文件处理时（建议文件多一些），子进程数目变化与处理总时长的关系。
+6（附加）. 如果修改2，3中的要求，不再为每个声音保存一个文件，而是将所有声音的结果保存到一个文件中，应该如何处理？比如，计算子进程会将结果写入一个队列，而一个新的Writer子进程将负责从队列里读取内容并写入一个特定的汇总文件。参考资料
+https://librosa.org/doc/latest/generated/librosa.yin.html#librosa.yinhttps://librosa.org/doc/latest/generated/librosa.amplitude_to_db.html#librosa.amplitude_to_db
+
+完整代码库import multiprocessing as mpimport osimport librosaimport timeimport matplotlib.pyplot as pltimport numpy as np
+
+基本代码def main_process(path):    wav_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            wav_doc_list.append(os.path.join(path, file))    return wav_doc_listdef sub_process(queue):    while not queue.empty():        path = queue.get()        write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)        with open(write_in_path, &#x27;w&#x27;) as f:            y, sr = librosa.load(path, sr=None)            pitches, magnitudes = librosa.piptrack(y=y, sr=sr)            data = &#x27;pitches: &#x27; + str(pitches) + &#x27;\n&#x27;+&#x27; magnitudes: &#x27; + str(magnitudes) + &#x27;\n&#x27;            f.write(data)class SubProcess(multiprocessing.Process):    def __init__(self, queue):        super().__init__()        self.queue = queue    def run(self):        while not self.queue.empty():            path = self.queue.get()            write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)            with open(write_in_path, &#x27;w&#x27;) as f:                y, sr = librosa.load(path, sr=None)                pitches, magnitudes = librosa.piptrack(y=y, sr=sr)                data = f&#x27;pitches: &#123;str(pitches)&#125;\n magnitudes: &#123;str(magnitudes)&#125;\n&#x27;                f.write(data)
+
+
+直接使用Process类构建子进程
+
+直接使用Process类构建子进程，利用libraso提供的支持来计算音高和声强，并保存计算结果到文件（一个声音一个文件 ）。
+
+在主进程中启动利用2，3中构建的子进程，并分发（如通过队列）参数（声音文件名）。
+
+
+
+def main_process(path):    mp3_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            mp3_doc_list.append(os.path.join(path, file))    return mp3_doc_listdef sub_process(queue):    while not queue.empty():        path = queue.get()        write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)        with open(write_in_path, &#x27;w&#x27;) as f:            y, sr = librosa.load(path, sr=None)            pitches, magnitudes = librosa.piptrack(y=y, sr=sr)            data = &#x27;pitches: &#x27; + str(pitches) + &#x27;\n&#x27;+&#x27; magnitudes: &#x27; + str(magnitudes) + &#x27;\n&#x27;            f.write(data)def main():    path = &#x27;C:/Users/Administrator/Desktop/using_python/wav_list&#x27;    doc_list = main_process(path=path)    queue = multiprocessing.Queue()    processes = []    for file in doc_list:        queue.put(file)    for _ in range(len(doc_list)):        pro_ = multiprocessing.Process(target=sub_process, args=(queue,))        pro_.start()        processes.append(pro_)    for ele in processes:        ele.join()    print(&#x27;已完成。&#x27;)if __name__ == &#x27;__main__&#x27;:    main()
+
+通过继承Process类来构建子进程
+
+通过继承Process类来构建子进程，同样利用libraso提供的支持来计算音高和声强，并保存计算结果到文件（一个声音一个文件 ）。
+
+在主进程中启动利用2，3中构建的子进程，并分发（如通过队列）参数（声音文件名）。
+
+
+
+def main_process(path):    wav_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            wav_doc_list.append(os.path.join(path, file))    return wav_doc_listclass SubProcess(multiprocessing.Process):    def __init__(self, queue):        super().__init__()        self.queue = queue    def run(self):        while not self.queue.empty():            path = self.queue.get()            write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)            with open(write_in_path, &#x27;w&#x27;) as f:                y, sr = librosa.load(path, sr=None)                pitches, magnitudes = librosa.piptrack(y=y, sr=sr)                data = f&#x27;pitches: &#123;str(pitches)&#125;\n magnitudes: &#123;str(magnitudes)&#125;\n&#x27;                f.write(data)def main():    path = &#x27;C:/Users/Administrator/Desktop/using_python/wav_list&#x27;    doc_list = main_process(path=path)    queue = multiprocessing.Queue()    processes = []    for file in doc_list:        queue.put(file)    for _ in range(len(doc_list)):        pro_ = SubProcess(queue=queue)        pro_.start()        processes.append(pro_)    for ele in processes:        ele.join()    print(&#x27;已完成。&#x27;)if __name__ == &#x27;__main__&#x27;:    main()
+
+探究子进程数目与运行时长的关系
+5（附加）. 观察在一定数目的声音文件处理时（建议文件多一些），子进程数目变化与处理总时长的关系。
+
+* 为了方便后续测试起见，以下代码中略去了最后一步文件写入的步骤。
+def main_process(path):    wav_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            wav_doc_list.append(os.path.join(path, file))    return wav_doc_listdef sub_process(path):    write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)    with open(write_in_path, &#x27;w&#x27;) as f:        y, sr = librosa.load(path, sr=None)        pitches, magnitudes = librosa.piptrack(y=y, sr=sr)        data = f&#x27;pitches: &#123;str(pitches)&#125;\n magnitudes: &#123;str(magnitudes)&#125;\n&#x27;        # f.write(data)def main():    path = &#x27;C:/Users/Administrator/Desktop/using_python/wav_list&#x27;    doc_list = main_process(path=path)    start=time.time()    pool = mp.Pool(processes=1)    result = pool.map(sub_process, doc_list)    end=time.time()    print(f&#x27;已完成, 耗时:&#123;end-start&#125;s&#x27;)if __name__ == &#x27;__main__&#x27;:    main()
+
+测试结果当processes==1时，耗时9.906246900558472s。
+当processes==3时，耗时4.453998327255249s。
+当processes==5时，耗时4.425124406814575s。
+当processes==7时，耗时4.3829286098480225s。
+当processes==8时，耗时4.366180181503296s。
+当processes==9时，耗时4.445085048675537s。
+当processes==12时，耗时4.432607412338257s。
+可以初步猜测随着进程数的增加，程序耗时向下降后上升。当进程数为8时，耗时达到最小。
+完整测试测试代码def main_process(path):    wav_doc_list = []    for file in os.listdir(path):        if file.endswith(&#x27;.wav&#x27;):            wav_doc_list.append(os.path.join(path, file))    return wav_doc_listdef sub_process(path):    write_in_path = path.replace(&#x27;.wav&#x27;, &#x27;.txt&#x27;)    with open(write_in_path, &#x27;w&#x27;) as f:        y, sr = librosa.load(path, sr=None)        pitches, magnitudes = librosa.piptrack(y=y, sr=sr)        data = f&#x27;pitches: &#123;str(pitches)&#125;\n magnitudes: &#123;str(magnitudes)&#125;\n&#x27;        # f.write(data)def main():    path = &#x27;C:/Users/Administrator/Desktop/using_python/wav_list&#x27;    doc_list = main_process(path=path)    x_list=[i for i in range(1,20)]    y_list=[]    for i in x_list:        start=time.time()        pool = mp.Pool(processes=i)        result = pool.map(sub_process, doc_list)        end=time.time()        y_list.append(end-start)    plt.title(&quot;Points and Fitting Curve&quot;)    plt.xlabel(&quot;process num/(int)&quot;)    plt.ylabel(&quot;time cost/(s)&quot;)    plt.grid(True)    plt.xlim(min(x_list) - 1, max(x_list) + 1)    plt.ylim(min(y_list) - 1, max(y_list) + 1)    plt.plot(x_list, y_list, &quot;ro&quot;)    for i in range(len(x_list)):        plt.annotate(&quot;(&#123;:.1f&#125;, &#123;:.1f&#125;)&quot;.format(x_list[i], y_list[i]), xy=(x_list[i], y_list[i]), xytext=(-15, 15),                     textcoords=&quot;Process num via time cost&quot;, ha=&quot;center&quot;, va=&quot;top&quot;)    coefficients = np.polyfit(np.array(x_list), np.array(y_list), 3)    p = np.poly1d(coefficients)    x_range = np.linspace(min(x_list) - 1, max(x_list) + 1, 1000)    y_range = p(x_range)    plt.plot(x_range, y_range, &quot;b-&quot;)    plt.show()if __name__ == &#x27;__main__&#x27;:    main()
+
+结论可见，随着进程数的增加，程序耗时向下降后上升。当进程数为8时，耗时达到最小。
+Week 12
+利用Python的多线程实现音频文件的采集，并计算语速。
+
+通过类继承，实现一个线程类，参考voa.py中的示例，从https://www.51voa.com/VOA_Standard_3.html (其中 “3”可被替换为其他数字，对应翻页操作)中获取新的链接地址列表。
+通过类继承，实现一个线程类，参考voa.py中的示例，从1中获取的链接（如https://www.51voa.com/VOA_Standard_English/u-s-supports-diversity-of-energy-sources-in-europe-79541.html）获取mp3文件链接。
+通过类继承，实现一个线程类，参考voa.py中的示例，利用2中的mp3文件链接（如https://files.51voa.cn/201806/fighting-tb-in-uzbekistan.mp3），将文件保存到本地。
+通过类继承，实现一个线程类，参考sr.py中的示例，对存储的音频文件计算语速。
+设计一种同步策略（比如用线程池，或锁，或队列等），实现1，2，3，4中几种不同功能线程的配合，实现多线程的mp3文件下载功能，并进行语速的计算和输出。
+(附加)考虑到Python的多进程更适合计算密集型的任务，可否在4中不使用线程，而使用多进程来计算存储文件的语速？即主进程的多线程负责音频文件的下载与存储，另几个子进程则负责语速计算。比较一下与5中线程设计的速度差异。
+（附加）音频采集如果时间过长，可能会因为外部因素（网络等）出现意外的中断，可否设计一种“断点”的记录机制，使得即使采集过程被打断，也能够从上次的断点继续开始，避免重复采集。
+
+
+库import threadingfrom threading import *import requestsfrom lxml import etreefrom tqdm import tqdmimport reimport waveimport datetimeimport timeimport librosaimport queueimport matplotlib.pyplot as pltimport sysimport os
+
+
+
+主体class VoaThread(Thread):    def __init__(self,start_page,end_page,link_list):        super().__init__()        self.start_page=start_page        self.end_page=end_page        self.link_list=link_list    def run(self):        for i in range(self.start_page,self.end_page):            url = f&#x27;https://www.51voa.com/VOA_Standard_&#123;i&#125;.html&#x27;            response=requests.get(url)            html=etree.HTML(response.text)            links=[]            for j in range(0,50):                links = links+html.xpath(&#x27;//*[@id=&quot;righter&quot;]/div[3]/ul/li[%s]/a/@href&#x27;%str(j))            for ele in links:                self.link_list.append(ele)class GetMP3Thread(Thread):    def __init__(self,link_list):        super().__init__()        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;        self.link_list=link_list        self.mlist=[]    def run(self):        for link in tqdm(self.link_list[:5]):            url=&#x27;https://www.51voa.com&#x27;+link            response=requests.get(url,headers=self.headers)            self.mlist = self.mlist+list(set(re.findall(r&#x27;https://.+?\.mp3&#x27;, response.text)))class DownloadMP3Thread(Thread):    def __init__(self, mlist, directory=&#x27;.&#x27;):        super().__init__()        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;        self.mlist = mlist        self.directory = directory    def run(self):        for murl in tqdm(self.mlist):            mp3_stream = requests.get(murl, headers=self.headers).content            fname = murl[murl.rfind(&#x27;/&#x27;) + 1:]            path = os.path.join(self.directory, fname)            with open(path, &#x27;wb&#x27;) as f:                f.write(mp3_stream)                class SpeechRateThread(Thread):    def __init__(self, filename):        super().__init__()        self.filename = filename        self.words_per_second = None    def run(self):        y, sr = librosa.load(self.filename, sr=None)        onsets = librosa.onset.onset_detect(y=y, sr=sr, units=&quot;time&quot;, hop_length=128, backtrack=False)        number_of_words = len(onsets)        duration = len(y) / sr        self.words_per_second = number_of_words / duration    def get_words_per_second(self):        return self.words_per_second
+
+
+
+获取链接并下载MP3文件问题：
+
+通过类继承，实现一个线程类，参考voa.py中的示例，从https://www.51voa.com/VOA_Standard_3.html (其中 “3”可被替换为其他数字，对应翻页操作)中获取新的链接地址列表。
+通过类继承，实现一个线程类，参考voa.py中的示例，从1中获取的链接（如https://www.51voa.com/VOA_Standard_English/u-s-supports-diversity-of-energy-sources-in-europe-79541.html）获取mp3文件链接。
+通过类继承，实现一个线程类，参考voa.py中的示例，利用2中的mp3文件链接（如https://files.51voa.cn/201806/fighting-tb-in-uzbekistan.mp3），将文件保存到本地。
+
+
+测试代码：def main():    link_list = []    voa_thread = VoaThread(1, 6, link_list)    voa_thread.start()    voa_thread.join()    get_mp3_thread = GetMP3Thread(link_list)    get_mp3_thread.start()    get_mp3_thread.join()    download_mp3_thread = DownloadMP3Thread(get_mp3_thread.mlist,&#x27;C:/Users/Administrator/Desktop/save_path&#x27;)    download_mp3_thread.start()    download_mp3_thread.join()if __name__ == &#x27;__main__&#x27;:    main()
+
+测试结果：计算对应音频文件的语速问题：
+
+通过类继承，实现一个线程类，参考sr.py中的示例，对存储的音频文件计算语速。
+
+
+测试代码：def main():        link_list = []        voa_thread = VoaThread(1, 6, link_list)        voa_thread.start()        voa_thread.join()        get_mp3_thread = GetMP3Thread(link_list)        get_mp3_thread.start()        get_mp3_thread.join()        download_mp3_thread = DownloadMP3Thread(get_mp3_thread.mlist)        download_mp3_thread.start()        download_mp3_thread.join()        for mp3_file in get_mp3_thread.mlist:            speechrate_thread = SpeechRateThread(mp3_file)            speechrate_thread.start()            speechrate_thread.join()            words_per_second = speechrate_thread.get_words_per_second()            print(f&quot;&#123;os.path.basename(mp3_file)&#125;: &#123;words_per_second&#125; words-per-second&quot;)if __name__ == &#x27;__main__&#x27;:    main()
+
+运行结果同步策略主体改动：class VoaThread(Thread):    def __init__(self,start_page,end_page,link_queue):        super().__init__()        self.start_page=start_page        self.end_page=end_page        self.link_queue=link_queue    def run(self):        for i in range(self.start_page,self.end_page):            url = f&#x27;https://www.51voa.com/VOA_Standard_&#123;i&#125;.html&#x27;            response=requests.get(url)            html=etree.HTML(response.text)            links=[]            for j in range(0,50):                links = links+html.xpath(&#x27;//*[@id=&quot;righter&quot;]/div[3]/ul/li[%s]/a/@href&#x27;%str(j))            for ele in links:                self.link_queue.put(ele)class GetMP3Thread(Thread):    def __init__(self,link_queue, mlist_queue):        super().__init__()        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;        self.link_queue=link_queue        self.mlist_queue=mlist_queue    def run(self):        while not self.link_queue.empty():            link = self.link_queue.get()            url=&#x27;https://www.51voa.com&#x27;+link            response=requests.get(url,headers=self.headers)            mlist = list(set(re.findall(r&#x27;https://.+?\.mp3&#x27;, response.text)))            for murl in mlist:                self.mlist_queue.put(murl)class DownloadMP3Thread(Thread):    def __init__(self, mlist_queue, directory=&#x27;.&#x27;):        super().__init__()        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;        self.mlist_queue = mlist_queue        self.directory = directory    def run(self):        while not self.mlist_queue.empty():            murl = self.mlist_queue.get()            mp3_stream = requests.get(murl, headers=self.headers).content            fname = murl[murl.rfind(&#x27;/&#x27;) + 1:]            path = os.path.join(self.directory, fname)            with open(path, &#x27;wb&#x27;) as f:                f.write(mp3_stream)class SpeechRateThread(Thread):    def __init__(self, filename, words_per_second_queue):        super().__init__()        self.filename = filename        self.words_per_second_queue = words_per_second_queue    def run(self):        y, sr = librosa.load(self.filename, sr=None)        onsets = librosa.onset.onset_detect(y=y, sr=sr, units=&quot;time&quot;, hop_length=128, backtrack=False)        number_of_words = len(onsets)        duration = len(y) / sr        words_per_second = number_of_words / duration        self.words_per_second_queue.put(words_per_second)
+
+测试代码：def main():    link_queue = queue.Queue()    mlist_queue = queue.Queue()    words_per_second_queue = queue.Queue()    voa_thread = VoaThread(1, 6, link_queue)    voa_thread.start()    voa_thread.join()    get_mp3_thread = GetMP3Thread(link_queue, mlist_queue)    get_mp3_thread.start()    download_mp3_threads = []    for i in range(5):        download_mp3_thread = DownloadMP3Thread(mlist_queue)        download_mp3_thread.start()        download_mp3_threads.append(download_mp3_thread)    get_mp3_thread.join()    speechrate_threads = []    for mp3_file in get_mp3_thread.mlist:        speechrate_thread = SpeechRateThread(mp3_file, words_per_second_queue)        speechrate_thread.start()        speechrate_threads.append(speechrate_thread)    for speechrate_thread in speechrate_threads:        speechrate_thread.join()    for i, mp3_file in enumerate(get_mp3_thread.mlist):        words_per_second = words_per_second_queue.get()        print(f&quot;&#123;i+1&#125;. &#123;os.path.basename(mp3_file)&#125;: &#123;words_per_second:.2f&#125; words-per-second&quot;)    for download_mp3_thread in download_mp3_threads:        download_mp3_thread.join()if __name__ == &#x27;__main__&#x27;:    main()
+
+Week 13作业描述
+协程有时被称为“微线程”，因为二者有类似的使用场景。和线程相比，协程占用资源更少、切换迅速，且实现简单（如协程是协作式调用，一般不用考虑资源的抢占，所以大部分情况下不需要通过同步原语来避免冲突）。通常协程被用在高并发的IO场景中。本周要求利用协程，实现一个协程爬虫类 VoaCrawler ，对第十二周作业的数据采集部分进行重新实现，即用协程实现Mp3音频文件的爬取（可以使用 gevent , aiohttop等第三方库），用 aiofiles 实现音频文件的存储。如果有余力，也可以继续改进 Bilibili_Crawler.py中的例子，使用 aiofiles 等进行文件存储，并测试大规模视频同时获取是否可行。
+
+代码import asyncioimport aiohttpimport aiofilesfrom lxml import etreefrom tqdm import tqdmimport reimport osclass VoaCrawler:    def __init__(self, start_page, end_page):        self.start_page = start_page        self.end_page = end_page        self.link_list = []        self.mlist = []        self.headers = &#123;            &#x27;User-Agent&#x27;: &#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36&#x27;        &#125;    async def get_links(self):        for i in range(self.start_page, self.end_page):            url = f&#x27;https://www.51voa.com/VOA_Standard_&#123;i&#125;.html&#x27;            async with aiohttp.ClientSession() as session:                async with session.get(url) as response:                    html = etree.HTML(await response.text())                    links = []                    for j in range(0, 50):                        links = links + html.xpath(&#x27;//*[@id=&quot;righter&quot;]/div[3]/ul/li[%s]/a/@href&#x27; % str(j))                    for ele in links:                        self.link_list.append(ele)    async def get_mp3(self):        async with aiohttp.ClientSession() as session:            for link in tqdm(self.link_list[:5]):                url = &#x27;https://www.51voa.com&#x27; + link                async with session.get(url, headers=self.headers) as response:                    self.mlist = self.mlist + list(set(re.findall(r&#x27;https://.+?\.mp3&#x27;, await response.text())))    async def download_mp3(self, directory=&#x27;.&#x27;):        async with aiohttp.ClientSession() as session:            for murl in tqdm(self.mlist):                mp3_stream = await session.get(murl, headers=self.headers)                fname = murl[murl.rfind(&#x27;/&#x27;) + 1:]                path = os.path.join(directory, fname)                async with aiofiles.open(path, &#x27;wb&#x27;) as f:                    await f.write(await mp3_stream.read())    async def run(self):        await self.get_links()        await self.get_mp3()        await self.download_mp3()        if __name__ == &#x27;__main__&#x27;:    crawler = VoaCrawler(1, 2)    asyncio.run(crawler.run())
+
+运行结果]]></content>
+      <tags>
+        <tag>机器学习</tag>
+        <tag>数据分析</tag>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>【数据结构】第一章-基本概念</title>
     <url>/2025/03/25/1556/</url>
     <content><![CDATA[数据结构基础概念一、基本概念
@@ -1795,60 +1849,6 @@ H、关系
       </tags>
   </entry>
   <entry>
-    <title>【数据结构】第二章-线性表</title>
-    <url>/2025/03/25/1558/</url>
-    <content><![CDATA[【数据结构】第二章-线性表线性表的定义线性表是具有相同数据类型的n（n≥0）个数据元素的有限序列，其中n为表长，当n&#x3D;0时线性表是一个空表。
-线性表的基本操作
-InitList(&amp;L): 初始化表。构造一个空的线性表L，分配内存空间。
-DestroyList(&amp;L): 销毁操作。销毁线性表，并释放线性表L所占用的内存空间。
-ListInsert(&amp;L,i,e): 插入操作。在表L中的第i个位置上插入指定元素e。
-ListDelete(&amp;L,i,&amp;e): 删除操作。删除表L中第i个位置的元素，并用e返回删除元素的值。
-LocateElem(L,e): 按值查找操作。在表L中查找具有给定关键字值的元素。
-GetElem(L,i): 按位查找操作。获取表L中第i个位置的元素的值。
-
-线性表的特点
-表中元素的个数有限
-表中元素具有逻辑上的顺序性，在序列中各元素排列有其先后次序
-表中元素都是数据元素，每个元素都是单个元素
-表中元素的数据类型都相同，这意味着每个元素占有相同大小的存储空间
-表中元素具有抽象性，即仅讨论元素间的逻辑关系，而不考虑元素究竟表示什么内容
-
-]]></content>
-      <tags>
-        <tag>408</tag>
-        <tag>数据结构</tag>
-        <tag>线性表</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>关于宋庆龄</title>
-    <url>/2022/04/03/1000/</url>
-    <content><![CDATA[下了什刹海站，穿越狭长的胡同，就来到了后海。沿着岸边走约百米，便是宋庆龄故居。春和景明，波澜不兴。我们来到这里的时候，路人笑着和我们说，院里的西府海棠正开得茂盛。 
-宋庆龄在北京的居所十分静谧。江南的假山、流水、小桥，北方迂回的长亭、宽敞的院落，摇曳的枝条与细碎的阳光，一切都结合得恰到好处。 
-在展馆的中央，是宋庆龄与孙中山的合影。四周陈满了信件和手稿。我被这样一句话吸引了：
-
-我是幸福的，我想尽量帮助我的丈夫处理英文信件。……对我来说，结婚就好像进了学校一样，不过没有烦人的“考试”罢了。  ——宋庆龄 
-
-通过阅读回忆录以及展品摘要，我们得知：在长期的相处和共同战斗之中，宋庆龄与孙中山坠入了爱河，甚至不顾父母的反对，逃离软禁。巨大的年龄差异没能成为他们爱情的鸿沟，他们携手走向永恒。 
-孙中山送给宋庆龄的定情信物是一把小巧精致的手枪，她一直携带在身上。如今在展台上依旧熠熠生辉。 
-1925 年，孙中山在北京逝世，她陷入了巨大的悲恸之中，但却没有因此消沉。在一年后的国民党二大上，发表了坚持孙中山三大政策的演说。她接续过丈夫身上的重担，继续为中国人民的民主与自由、和平与发展奋斗着。宋庆龄为了丈夫的遗愿，再次踏上了旅居欧洲的行程。她访问了莫斯科，寻求革命道路，在前苏联和欧洲求学，与友人积极探讨革命理论。 
-宋庆龄为革命事业、和平事业和妇女儿童福利事业奋斗了终生。和孙中山一样，宋庆龄庆龄在国外接受了现代化的教育，萌生了先进的思想，在很多方面与孙中山先生相投。二人并不受封建思想观念的束缚，彼此奔赴成为眷属。早年，她谨慎热情地帮助孙中山先生处理各项事务，照顾他的生活，甚至是在危难关头毫不犹豫地挡在他地身前。体贴周到使得他得以安心的工作。在孙中山病逝后，她依然秉承着丈夫的志向，走向时代的风暴之眼。 
-回顾宋庆龄先生的一生，我们很难不从中得到启迪。宋庆龄先生有着一颗赤诚的心，一是对自己的丈夫忠诚，她同他一起战斗，为他仕病、完成了他的遗愿；二是对华夏民族赤城。不论我们将目光投向哪个时间节点，宋庆龄先生永远是同中华民族的利益站在一起的，她总是不顾自己的安危，在骤变之时勇敢地批判、指责走向歧途的国民党，她所做的一切，都是为了让百姓免受苦难，让主权得以保证。 
-出了展馆，再往前走十几米，就是和平鸽舍。宋庆龄先生享誉世界的另一个原因，便是她长期担任大量教育、妇女儿童等方面福利活动的要职，奔赴世界各地、前往第三世界的国家进行交流，成立大量基金会，矢志不渝地为中国和平乃至世界和平奋斗着。 
-一名女性能在这样纷乱复杂、风起云涌的时代做出如此之多的贡献，是很难想象的。 
-1981年5 月29日，民主与和平的斗士最终陨落了。她的故事、信件、手稿、画像、物件等被后人妥善地保存了下来，存放在这里，向公众展览。这里成为了一个爱国主义教育基地。 
-心中但有信念，无处不放光芒。 
-
-2022年4月于北京
-]]></content>
-      <tags>
-        <tag>随笔</tag>
-        <tag>宋庆龄</tag>
-        <tag>历史</tag>
-        <tag>人物</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>关于梦境</title>
     <url>/1900/01/01/0000/</url>
     <content><![CDATA[先让时间无限倒退！此处标注的时间是计算机能够表示的最早时刻。这篇博文记录的文字没有经过加工，大多是我在半梦半醒的状态下记录下来的，读起来并不通顺。
@@ -1864,23 +1864,6 @@ GetElem(L,i): 按位查找操作。获取表L中第i个位置的元素的值。
         <tag>随笔</tag>
         <tag>记录</tag>
         <tag>梦境</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>半年志</title>
-    <url>/2024/06/25/2338/</url>
-    <content><![CDATA[时间过得真快啊！还来不及为春节题文，一眨眼已是年中了。
-
-这一学期所学的课程，…
-
- 能够掌握专业知识和技能，必然是极好的。只是，在我愈发的深入了解██这个专业后，我逐渐产生了逃离感，愈发地向自己发问：这真的是我想要的生活吗？又或许从高考填志愿就已经注定了。我在大二的时候有过转专业的想法，但最终还是为了一年的沉没成本想着暂且读下去。这份遗憾自高考录取起，雪藏了三年，兜兜转转又回到了原点。直至癸卯年腊月的某一个下午，初见██的那怦然心动的一刻，我心里大抵也有了想法——████。但囿于21级各大改革的阵痛，这一个学期的复习并不顺利。毕竟要学许许多多新的东西。眼下繁多的课程及学校布置的任务，以及突然延长的强制生产实习，留给我复习的时间已经不多了。
- 最后，回顾整个学期。2024年悄然过半，又到了写半年志的时候。真正地提起了笔，静待思绪涌现，沉默良久后又作罢。依旧是兵荒马乱的半年，曾几何时，我耗费了太多的时间在一些或有意义或无意义的事情上。悟已往之不谏，知来者之可追。既然选择了这条路，就应当坚定走下去，何必欸奈路途艰难。希望馀下的这半年岁月里我们都能成长成为更好的人，“縱浪大化裡，不喜亦不懼”。
-甲辰年庚午月于北京
-]]></content>
-      <tags>
-        <tag>生活</tag>
-        <tag>随笔</tag>
-        <tag>感悟</tag>
       </tags>
   </entry>
   <entry>
@@ -1965,6 +1948,23 @@ GetElem(L,i): 按位查找操作。获取表L中第i个位置的元素的值。
       </tags>
   </entry>
   <entry>
+    <title>半年志</title>
+    <url>/2024/06/25/2338/</url>
+    <content><![CDATA[时间过得真快啊！还来不及为春节题文，一眨眼已是年中了。
+
+这一学期所学的课程，…
+
+ 能够掌握专业知识和技能，必然是极好的。只是，在我愈发的深入了解██这个专业后，我逐渐产生了逃离感，愈发地向自己发问：这真的是我想要的生活吗？又或许从高考填志愿就已经注定了。我在大二的时候有过转专业的想法，但最终还是为了一年的沉没成本想着暂且读下去。这份遗憾自高考录取起，雪藏了三年，兜兜转转又回到了原点。直至癸卯年腊月的某一个下午，初见██的那怦然心动的一刻，我心里大抵也有了想法——████。但囿于21级各大改革的阵痛，这一个学期的复习并不顺利。毕竟要学许许多多新的东西。眼下繁多的课程及学校布置的任务，以及突然延长的强制生产实习，留给我复习的时间已经不多了。
+ 最后，回顾整个学期。2024年悄然过半，又到了写半年志的时候。真正地提起了笔，静待思绪涌现，沉默良久后又作罢。依旧是兵荒马乱的半年，曾几何时，我耗费了太多的时间在一些或有意义或无意义的事情上。悟已往之不谏，知来者之可追。既然选择了这条路，就应当坚定走下去，何必欸奈路途艰难。希望馀下的这半年岁月里我们都能成长成为更好的人，“縱浪大化裡，不喜亦不懼”。
+甲辰年庚午月于北京
+]]></content>
+      <tags>
+        <tag>生活</tag>
+        <tag>随笔</tag>
+        <tag>感悟</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>最后一堂课</title>
     <url>/2023/12/10/2113/</url>
     <content><![CDATA[
@@ -1978,30 +1978,6 @@ Gilbert Strang有着独特的魅力，不光是张老师，世人都很崇拜他
         <tag>生活</tag>
         <tag>随笔</tag>
         <tag>大学</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>浪迹天涯</title>
-    <url>/2024/07/29/0021/</url>
-    <content><![CDATA[这一个月来的实习真是令人心力憔悴，渐而使我愈发地有了逃离感。每天面对着堆积如山的实习工作和学习任务，我仿佛被压在巨石下的蚂蚁，挣扎着寻找一丝透气的空间。
-不得不承认中█████研究院确实是一个大佬云集的地方，这里齐聚着各式各样人才，只是茶余饭后片刻的随想便已是我无法企及的高度。只可惜，每个人都是忙忙碌碌的，却又充满了希望，唯独我。
-我总是一遍又一遍的思考着自己究竟想要什么——我并不是一个逆来顺受、安于现状的人，我仿佛就不是industrial engineering专业的人，更不是一个称手的研究助理：这不是理想中的生活，我只想跳出当下的圈子。
-实习+学习的双重任务压得我喘不过气。我开始怀疑自己的选择，开始质疑自己的能力，甚至开始害怕面对未来。是否真的有勇气面对失败，就此，浪迹天涯，无人理解。
-
-寂寞与孤独，是亘古不变的主题。
-
-我只是一个微不足道的存在，一个在这个世界上挣扎求生的普通人。才刚踏上心灵的摆渡之旅，希望小小浪花不至将我吹翻，也不至触及礁石、湮入大海。
-倘若我真的就这样开始了流浪，我将不再被那些无形的枷锁束缚。我将放下那些曾经让我窒息的期望和责任，去追寻那些真正让我心动的事物。我会走过繁华的城市，也会穿越寂静的乡村；我会在星空下许下愿望，也会在暴风雨中寻找庇护。
-但也许，我将一直孤独地行走，直到世界的尽头。那时，我或许会明白，真正的自由不是逃避，而是在面对生活的重压时，依然能够保持内心的平静和坚定。
-我会写下我的所见所闻；我会，
-
-浪迹天涯。
-
-]]></content>
-      <tags>
-        <tag>生活</tag>
-        <tag>随笔</tag>
-        <tag>感悟</tag>
       </tags>
   </entry>
   <entry>
@@ -2066,6 +2042,30 @@ ref.
         <tag>哲学</tag>
         <tag>社会现象</tag>
         <tag>思考</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>浪迹天涯</title>
+    <url>/2024/07/29/0021/</url>
+    <content><![CDATA[这一个月来的实习真是令人心力憔悴，渐而使我愈发地有了逃离感。每天面对着堆积如山的实习工作和学习任务，我仿佛被压在巨石下的蚂蚁，挣扎着寻找一丝透气的空间。
+不得不承认中█████研究院确实是一个大佬云集的地方，这里齐聚着各式各样人才，只是茶余饭后片刻的随想便已是我无法企及的高度。只可惜，每个人都是忙忙碌碌的，却又充满了希望，唯独我。
+我总是一遍又一遍的思考着自己究竟想要什么——我并不是一个逆来顺受、安于现状的人，我仿佛就不是industrial engineering专业的人，更不是一个称手的研究助理：这不是理想中的生活，我只想跳出当下的圈子。
+实习+学习的双重任务压得我喘不过气。我开始怀疑自己的选择，开始质疑自己的能力，甚至开始害怕面对未来。是否真的有勇气面对失败，就此，浪迹天涯，无人理解。
+
+寂寞与孤独，是亘古不变的主题。
+
+我只是一个微不足道的存在，一个在这个世界上挣扎求生的普通人。才刚踏上心灵的摆渡之旅，希望小小浪花不至将我吹翻，也不至触及礁石、湮入大海。
+倘若我真的就这样开始了流浪，我将不再被那些无形的枷锁束缚。我将放下那些曾经让我窒息的期望和责任，去追寻那些真正让我心动的事物。我会走过繁华的城市，也会穿越寂静的乡村；我会在星空下许下愿望，也会在暴风雨中寻找庇护。
+但也许，我将一直孤独地行走，直到世界的尽头。那时，我或许会明白，真正的自由不是逃避，而是在面对生活的重压时，依然能够保持内心的平静和坚定。
+我会写下我的所见所闻；我会，
+
+浪迹天涯。
+
+]]></content>
+      <tags>
+        <tag>生活</tag>
+        <tag>随笔</tag>
+        <tag>感悟</tag>
       </tags>
   </entry>
 </search>
