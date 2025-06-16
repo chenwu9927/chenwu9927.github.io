@@ -1,4 +1,4 @@
-(()=>{let e,n,o,s,l=!0;function r(t,e){var n=document.createElement("button");return n.innerHTML=t,n.title=e,n.style.cssText=`
+(()=>{let e,n,o,s,l=!1;function r(t,e){var n=document.createElement("button");return n.innerHTML=t,n.title=e,n.style.cssText=`
             width: 50px;
             height: 50px;
             border-radius: 50%;
